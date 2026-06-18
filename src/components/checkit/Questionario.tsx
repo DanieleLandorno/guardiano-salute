@@ -118,6 +118,18 @@ export function Questionario() {
 
 type Common = { section: number; seg5Progress?: number; onBack: () => void; onContinue: () => void };
 
+function SkipButton({ selected, onClick, label = "Non so / Preferisco non rispondere" }: { selected: boolean; onClick: () => void; label?: string }) {
+  return (
+    <button type="button" onClick={onClick} style={{
+      marginTop: 8, width: "100%", padding: 12, cursor: "pointer", borderRadius: "var(--radius-md)",
+      border: selected ? "1.5px solid var(--teal-500)" : "1.5px solid transparent",
+      background: selected ? "var(--teal-050)" : "transparent",
+      fontFamily: "var(--font-sans)", fontSize: 15, fontWeight: 600,
+      color: selected ? "var(--teal-700)" : "var(--ink-500)", textAlign: "center",
+    }}>{label}</button>
+  );
+}
+
 function VenusGlyph({ color = "var(--teal-900)" }: { color?: string }) {
   return (
     <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke={color}
