@@ -118,6 +118,18 @@ export function Questionario() {
 
 type Common = { section: number; seg5Progress?: number; onBack: () => void; onContinue: () => void };
 
+function SkipButton({ selected, onClick, label = "Non so / Preferisco non rispondere" }: { selected: boolean; onClick: () => void; label?: string }) {
+  return (
+    <button type="button" onClick={onClick} style={{
+      marginTop: 8, width: "100%", padding: 12, cursor: "pointer", borderRadius: "var(--radius-md)",
+      border: selected ? "1.5px solid var(--teal-500)" : "1.5px solid transparent",
+      background: selected ? "var(--teal-050)" : "transparent",
+      fontFamily: "var(--font-sans)", fontSize: 15, fontWeight: 600,
+      color: selected ? "var(--teal-700)" : "var(--ink-500)", textAlign: "center",
+    }}>{label}</button>
+  );
+}
+
 function VenusGlyph({ color = "var(--teal-900)" }: { color?: string }) {
   return (
     <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke={color}
@@ -303,7 +315,7 @@ function StepComorbidita({ value, onSet, ...c }: Common & { value: string[]; onS
           <span style={{ flex: 1, height: 1, background: "var(--line-100)" }} />
         </div>
         <OptionButton selected={value.includes("nessuna")} onClick={() => toggle("nessuna")}>Nessuna di queste</OptionButton>
-        <OptionButton selected={value.includes("ns")} onClick={() => toggle("ns")}>Non so / Preferisco non rispondere</OptionButton>
+        <SkipButton selected={value.includes("ns")} onClick={() => toggle("ns")} />
       </div>
     </QuestionFrame>
   );
@@ -350,9 +362,7 @@ function StepFamOnco({ value, onSet, ...c }: Common & { value: string[]; onSet: 
         <div style={{ flex: 1 }}><OptionButton compact selected={sel === "si"} onClick={() => { setSel("si"); onSet(value.filter(v => v !== "ns")); }}>Sì</OptionButton></div>
         <div style={{ flex: 1 }}><OptionButton compact selected={sel === "no"} onClick={() => { setSel("no"); onSet([]); }}>No</OptionButton></div>
       </div>
-      <div style={{ marginTop: 12 }}>
-        <OptionButton compact selected={sel === "ns"} onClick={() => { setSel("ns"); onSet(["ns"]); }}>Non so / Preferisco non rispondere</OptionButton>
-      </div>
+      <SkipButton selected={sel === "ns"} onClick={() => { setSel("ns"); onSet(["ns"]); }} />
       {sel === "si" && (
         <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid var(--line-100)", display: "flex", flexDirection: "column", gap: 10 }}>
           <FieldLabel>Di quale tipo? Puoi indicarne più di uno.</FieldLabel>
@@ -540,12 +550,12 @@ function StepAttivita({ value, onSet, ...c }: Common & { value?: UserProfile["at
     ["raramente","Qualche volta al mese"],
     ["qualche","Almeno una volta a settimana"],
     ["spesso","Più volte a settimana"],
-    ["ns","Non so / Preferisco non rispondere"],
   ];
   return (
     <QuestionFrame {...c} question="Quanto spesso fai attività fisica?" canContinue={!!value}>
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         {opts.map(([k,l]) => <OptionButton key={k} selected={value === k} onClick={() => onSet(k)}>{l}</OptionButton>)}
+        <SkipButton selected={value === "ns"} onClick={() => onSet("ns")} />
       </div>
     </QuestionFrame>
   );
@@ -557,7 +567,8 @@ function StepSingleChoice({
   return (
     <QuestionFrame {...c} question={question} canContinue={!!value} aboveTitle={aboveTitle} cta={cta} ctaVariant={ctaVariant}>
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        {opts.map(([k,l]) => <OptionButton key={k} selected={value === k} onClick={() => onSet(k)}>{l}</OptionButton>)}
+        {opts.filter(([k]) => k !== "ns").map(([k,l]) => <OptionButton key={k} selected={value === k} onClick={() => onSet(k)}>{l}</OptionButton>)}
+        {opts.some(([k]) => k === "ns") && <SkipButton selected={value === "ns"} onClick={() => onSet("ns")} />}
       </div>
     </QuestionFrame>
   );
