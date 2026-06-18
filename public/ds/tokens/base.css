@@ -1,0 +1,72 @@
+/* ============================================================
+   CheckIt — Base element styles & helper classes
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--text-leading);
+  color: var(--text-body);
+  background: var(--bg-page);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Display headings use Fraunces */
+.ci-display {
+  font-family: var(--font-display);
+  font-weight: var(--fw-display);
+  font-optical-sizing: auto;
+  font-variation-settings: var(--font-display-settings);
+  line-height: var(--display-leading);
+  letter-spacing: var(--display-tracking);
+  color: var(--text-strong);
+  margin: 0;
+}
+
+/* Uppercase eyebrow / section label */
+.ci-eyebrow {
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--label-tracking);
+  text-transform: uppercase;
+  color: var(--text-accent);
+}
+
+/* Italic accent inside a display headline (matches brand deck) */
+.ci-accent {
+  font-style: italic;
+  color: var(--accent);
+}
+
+a {
+  color: var(--text-accent);
+  text-decoration: none;
+}
+
+:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+button {
+  font-family: inherit;
+}
+
+/* Generic soft card */
+.ci-card {
+  background: var(--surface-card);
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--pad-card);
+}
