@@ -295,7 +295,7 @@ function StepComorbidita({ value, onSet, ...c }: Common & { value: string[]; onS
     onSet(next.includes(k) ? next.filter((x) => x !== k) : [...next, k]);
   };
   return (
-    <QuestionFrame {...c} question="Ti è mai stata diagnosticata una di queste condizioni?">
+    <QuestionFrame {...c} question="Ti è mai stata diagnosticata una di queste condizioni?" canContinue={value.length > 0}>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {opts.map(([k,l]) => <OptionButton key={k} multi selected={value.includes(k)} onClick={() => toggle(k)}>{l}</OptionButton>)}
         <div style={{ display: "flex", alignItems: "center", gap: 14, margin: "4px 2px" }}>
