@@ -1,0 +1,85 @@
+/* ============================================================
+   CheckIt — Color tokens
+   Clinical, light, reassuring. Teal-led, never rainbow-pastel.
+   ============================================================ */
+
+:root {
+  /* ---- Brand teal ramp ---- */
+  --teal-900: #04342C; /* Petrolio profondo — titoli, testo forte */
+  --teal-800: #0A4A3C;
+  --teal-700: #0F6E56; /* Teal scuro — CTA principali, blocchi forti */
+  --teal-600: #157E62;
+  --teal-500: #1D9E75; /* Teal primario — accenti, icone, attivi */
+  --teal-400: #4FB894;
+  --teal-300: #8AD3BB;
+  --teal-200: #BCE7D7;
+  --teal-100: #E1F5EE; /* Teal chiarissimo — sfondi soft, badge in regola */
+  --teal-050: #F0FAF6;
+
+  /* ---- Neutrals ---- */
+  --ink-900: #1A2420; /* deep ink for body where teal-900 is too heavy */
+  --ink-700: #3D4A45;
+  --ink-500: #61706A; /* secondary text */
+  --ink-400: #8A968F; /* tertiary / placeholder */
+  --ink-300: #C2CAC6; /* hairline-strong */
+  --line-200: #E4E7E3; /* borders, dividers */
+  --line-100: #EEF0EC;
+
+  --surface-page: #FFFFFF;   /* page background */
+  --surface-sunken: #F5F5F2; /* sunken surfaces, app canvas */
+  --surface-card: #FFFFFF;   /* cards */
+  --white: #FFFFFF;
+
+  /* ---- Alert / semantic ---- */
+  --red-600: #C53A39;
+  --red-500: #E24B4A; /* Rosso allerta — scadenze/urgenze */
+  --red-100: #FCEBEB; /* badge background allerta */
+
+  --amber-500: #E0A53B; /* attesa / da prenotare (used sparingly) */
+  --amber-100: #FBF1DD;
+
+  /* ---- Soft category tints (icon tondini & grouping) ---- */
+  --cat-screening:  #E1F5EE; --cat-screening-ink:  #0F6E56;
+  --cat-lab:        #FCEBEB; --cat-lab-ink:        #C53A39;
+  --cat-imaging:    #E6F0F4; --cat-imaging-ink:    #2C6E84;
+  --cat-document:   #EFEBF7; --cat-document-ink:   #5B4B86;
+  --cat-reminder:   #FBF1DD; --cat-reminder-ink:   #97681A;
+  --cat-wellness:   #EAF3E6; --cat-wellness-ink:   #4A7236;
+
+  /* ============================================================
+     Semantic aliases — reference these in components
+     ============================================================ */
+  --text-strong: var(--teal-900);   /* headings, strong text */
+  --text-body: var(--ink-900);
+  --text-secondary: var(--ink-500);
+  --text-tertiary: var(--ink-400);
+  --text-on-teal: #FFFFFF;
+  --text-accent: var(--teal-700);
+
+  --bg-page: var(--surface-page);
+  --bg-canvas: var(--surface-sunken);
+  --bg-soft: var(--teal-100);
+  --bg-soft-050: var(--teal-050);
+
+  --border-card: var(--line-200);
+  --border-input: var(--ink-300);
+  --divider: var(--line-200);
+
+  --accent: var(--teal-500);
+  --accent-strong: var(--teal-700);
+
+  --cta-bg: var(--teal-700);
+  --cta-bg-hover: var(--teal-800);
+  --cta-bg-active: var(--teal-900);
+  --cta-text: #FFFFFF;
+
+  /* Status code (navigation & badges) */
+  --status-due: var(--red-500);      /* in scadenza */
+  --status-due-bg: var(--red-100);
+  --status-ok: var(--teal-500);      /* in regola */
+  --status-ok-bg: var(--teal-100);
+  --status-future: var(--ink-400);   /* futuro */
+  --status-future-bg: var(--line-100);
+
+  --focus-ring: #1D9E75;
+}

@@ -1,0 +1,50 @@
+/* ============================================================
+   CheckIt — Typography tokens
+   Display: Fraunces (serif, screen titles & headlines only)
+   Text:    Inter (everything else). Never below 15px.
+   ============================================================ */
+
+:root {
+  --font-display: "Source Serif 4", "Source Serif Pro", Georgia, "Times New Roman", serif;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  /* Source Serif 4 is a variable family; no quirk axes to tune. */
+  --font-display-settings: normal;
+
+  /* Weights */
+  --fw-regular: 400; /* @kind font */
+  --fw-medium: 500; /* @kind font */
+  --fw-semibold: 600; /* @kind font */
+  --fw-display: 650; /* display serif titles — a touch above semibold @kind font */
+  --fw-bold: 700; /* @kind font */
+
+  /* Display sizes (Source Serif 4) — screen titles, headlines */
+  --display-2xl: 56px;
+  --display-xl: 44px;
+  --display-lg: 34px;
+  --display-md: 28px;
+  --display-sm: 23px;
+  --display-leading: 1.08;
+  --display-tracking: -0.01em;
+
+  /* Text sizes (Inter) — accessibility floor is 15px */
+  --text-xs: 13px;  /* USE SPARINGLY — labels/captions only, never body */
+  --text-sm: 15px;  /* minimum body size */
+  --text-base: 17px;/* default body — generous for over-50 readers */
+  --text-md: 19px;
+  --text-lg: 21px;
+  --text-xl: 24px;
+  --text-2xl: 28px;
+
+  --text-leading-tight: 1.25;
+  --text-leading: 1.5;
+  --text-leading-relaxed: 1.65;
+
+  --label-tracking: 0.04em; /* uppercase eyebrow labels */
+
+  /* Semantic type aliases */
+  --type-screen-title-size: var(--display-lg);
+  --type-headline-size: var(--display-md);
+  --type-body-size: var(--text-base);
+  --type-label-size: var(--text-sm);
+}
