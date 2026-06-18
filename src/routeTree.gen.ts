@@ -9,8 +9,32 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as QuestionarioRouteImport } from './routes/questionario'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PianoRouteImport } from './routes/piano'
+import { Route as ComeFunzionaRouteImport } from './routes/come-funziona'
 import { Route as IndexRouteImport } from './routes/index'
 
+const QuestionarioRoute = QuestionarioRouteImport.update({
+  id: '/questionario',
+  path: '/questionario',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PianoRoute = PianoRouteImport.update({
+  id: '/piano',
+  path: '/piano',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ComeFunzionaRoute = ComeFunzionaRouteImport.update({
+  id: '/come-funziona',
+  path: '/come-funziona',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +43,78 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/come-funziona': typeof ComeFunzionaRoute
+  '/piano': typeof PianoRoute
+  '/privacy': typeof PrivacyRoute
+  '/questionario': typeof QuestionarioRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/come-funziona': typeof ComeFunzionaRoute
+  '/piano': typeof PianoRoute
+  '/privacy': typeof PrivacyRoute
+  '/questionario': typeof QuestionarioRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/come-funziona': typeof ComeFunzionaRoute
+  '/piano': typeof PianoRoute
+  '/privacy': typeof PrivacyRoute
+  '/questionario': typeof QuestionarioRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/come-funziona' | '/piano' | '/privacy' | '/questionario'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/come-funziona' | '/piano' | '/privacy' | '/questionario'
+  id:
+    | '__root__'
+    | '/'
+    | '/come-funziona'
+    | '/piano'
+    | '/privacy'
+    | '/questionario'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ComeFunzionaRoute: typeof ComeFunzionaRoute
+  PianoRoute: typeof PianoRoute
+  PrivacyRoute: typeof PrivacyRoute
+  QuestionarioRoute: typeof QuestionarioRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/questionario': {
+      id: '/questionario'
+      path: '/questionario'
+      fullPath: '/questionario'
+      preLoaderRoute: typeof QuestionarioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/piano': {
+      id: '/piano'
+      path: '/piano'
+      fullPath: '/piano'
+      preLoaderRoute: typeof PianoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/come-funziona': {
+      id: '/come-funziona'
+      path: '/come-funziona'
+      fullPath: '/come-funziona'
+      preLoaderRoute: typeof ComeFunzionaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,6 +127,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ComeFunzionaRoute: ComeFunzionaRoute,
+  PianoRoute: PianoRoute,
+  PrivacyRoute: PrivacyRoute,
+  QuestionarioRoute: QuestionarioRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
