@@ -452,19 +452,19 @@ function StepFumo({ profile, update, ...c }: Common & { profile: Partial<UserPro
       )}
 
       {sel === "no" && (
-        <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid var(--line-100)", display: "flex", flexDirection: "column", gap: 12 }}>
+        <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid var(--line-100)", display: "flex", flexDirection: "column", gap: 8 }}>
           <FieldLabel>Hai mai fumato in passato?</FieldLabel>
           <OptionButton compact selected={past === "mai"} onClick={() => setPast("mai")}>No, non ho mai fumato</OptionButton>
           <OptionButton compact selected={past === "smesso"} onClick={() => setPast("smesso")}>Sì, ma ho smesso</OptionButton>
 
           {past === "smesso" && (
-            <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 8 }}>
+            <div style={{ marginTop: 4, display: "flex", flexDirection: "column", gap: 6 }}>
               <FieldLabel>Da quanto hai smesso?</FieldLabel>
-              <div style={{ display: "flex", gap: 12 }}>
+              <div style={{ display: "flex", gap: 10 }}>
                 <NumberWheel label="Anni" value={anni} min={0} max={60} onChange={setAnni} />
                 <NumberWheel label="Mesi" value={mesi} min={0} max={11} onChange={setMesi} />
               </div>
-              <p style={{ margin: "4px 0 0", textAlign: "center", fontFamily: "var(--font-sans)", fontSize: 14, color: "var(--teal-700)", fontWeight: 600 }}>
+              <p style={{ margin: "2px 0 0", textAlign: "center", fontFamily: "var(--font-sans)", fontSize: 13, color: "var(--teal-700)", fontWeight: 600 }}>
                 {anni} {anni === 1 ? "anno" : "anni"} · {mesi} {mesi === 1 ? "mese" : "mesi"}
               </p>
             </div>
