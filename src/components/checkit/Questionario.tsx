@@ -26,7 +26,8 @@ export function Questionario() {
   const baseSteps: StepKey[] = ["sesso", "data_nascita", "regione", "comorbidita", "oncologica", "fam_onco", "fam_diabete", "fam_cardio", "fumo", "peso_altezza", "attivita", "pelle_a", "pelle_b", "pelle_c"];
   const sec5: StepKey[] = [];
   if (sesso === "F") {
-    sec5.push("hpv", "cervicale");
+    if (eta >= 25 && eta <= 29) sec5.push("hpv");
+    sec5.push("cervicale");
     if (eta >= 45) sec5.push("mammografia");
   }
   if (sesso === "M" && eta >= 50) sec5.push("psa");
