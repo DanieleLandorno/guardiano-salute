@@ -385,11 +385,11 @@ function NumberWheel({ label, value, min, max, onChange }: { label: string; valu
     <div
       onClick={() => n != null && !active && onChange(n)}
       style={{
-        height: 56, display: "flex", alignItems: "center", justifyContent: "center",
+        height: 40, display: "flex", alignItems: "center", justifyContent: "center",
         cursor: n != null && !active ? "pointer" : "default",
         fontFamily: "var(--font-display)", fontVariationSettings: "var(--font-display-settings)",
         fontWeight: active ? 700 : 400,
-        fontSize: active ? 36 : 28,
+        fontSize: active ? 24 : 18,
         color: active ? "var(--teal-900)" : "var(--ink-300)",
         background: active ? "var(--teal-050)" : "transparent",
         border: active ? "1.5px solid var(--teal-500)" : "1.5px solid transparent",
@@ -401,10 +401,10 @@ function NumberWheel({ label, value, min, max, onChange }: { label: string; valu
     </div>
   );
   return (
-    <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4 }}>
-      <span style={{ textAlign: "center", fontFamily: "var(--font-sans)", fontSize: 13, fontWeight: 700,
-        letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--ink-500)", marginBottom: 6 }}>{label}</span>
-      <div style={{ border: "1.5px solid var(--line-200)", borderRadius: "var(--radius-md)", padding: "6px 0", background: "var(--surface-card)" }}>
+    <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
+      <span style={{ textAlign: "center", fontFamily: "var(--font-sans)", fontSize: 12, fontWeight: 700,
+        letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--ink-500)", marginBottom: 4 }}>{label}</span>
+      <div style={{ border: "1.5px solid var(--line-200)", borderRadius: "var(--radius-md)", padding: "4px 0", background: "var(--surface-card)" }}>
         {row(prev, false)}
         {row(value, true)}
         {row(next, false)}
