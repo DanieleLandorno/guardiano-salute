@@ -129,11 +129,11 @@ function inAgeRange(eta: number, min?: number, max?: number) {
   return true;
 }
 
-function eligible(s: (typeof RULES_JSON.screenings)[number], u: UserProfile): boolean {
+function eligible(s: any, u: UserProfile): boolean {
   const cb = s.criteri_base;
-  if (!cb.sesso.includes(u.sesso)) return false;
+  if (!(cb.sesso as readonly string[]).includes(u.sesso)) return false;
   if (!inAgeRange(u.eta, cb.eta_min, cb.eta_max)) return false;
-  const excl = cb.escludi_se?.diagnosi_oncologica ?? [];
+  const excl: string[] = cb.escludi_se?.diagnosi_oncologica ?? [];
   if (excl.some((d) => (u.diagnosi_oncologica ?? []).includes(d))) return false;
   return true;
 }
