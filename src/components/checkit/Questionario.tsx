@@ -362,9 +362,7 @@ function StepFamOnco({ value, onSet, ...c }: Common & { value: string[]; onSet: 
         <div style={{ flex: 1 }}><OptionButton compact selected={sel === "si"} onClick={() => { setSel("si"); onSet(value.filter(v => v !== "ns")); }}>Sì</OptionButton></div>
         <div style={{ flex: 1 }}><OptionButton compact selected={sel === "no"} onClick={() => { setSel("no"); onSet([]); }}>No</OptionButton></div>
       </div>
-      <div style={{ marginTop: 12 }}>
-        <OptionButton compact selected={sel === "ns"} onClick={() => { setSel("ns"); onSet(["ns"]); }}>Non so / Preferisco non rispondere</OptionButton>
-      </div>
+      <SkipButton selected={sel === "ns"} onClick={() => { setSel("ns"); onSet(["ns"]); }} />
       {sel === "si" && (
         <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid var(--line-100)", display: "flex", flexDirection: "column", gap: 10 }}>
           <FieldLabel>Di quale tipo? Puoi indicarne più di uno.</FieldLabel>
