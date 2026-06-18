@@ -287,9 +287,10 @@ function StepRegione({ value, onSet, ...c }: Common & { value?: string; onSet: (
 
 function StepComorbidita({ value, onSet, ...c }: Common & { value: string[]; onSet: (v: string[]) => void }) {
   const opts: [string,string][] = [["ipertensione","Ipertensione"],["diabete","Diabete"],["colesterolo","Colesterolo o trigliceridi alti"]];
+  const EXCLUSIVE = ["nessuna", "ns"];
   const toggle = (k: string) => {
-    if (k === "nessuna") { onSet(value.includes("nessuna") ? [] : ["nessuna"]); return; }
-    const next = value.filter((x) => x !== "nessuna");
+    if (EXCLUSIVE.includes(k)) { onSet(value.includes(k) ? [] : [k]); return; }
+    const next = value.filter((x) => !EXCLUSIVE.includes(x));
     onSet(next.includes(k) ? next.filter((x) => x !== k) : [...next, k]);
   };
   return (
@@ -302,6 +303,7 @@ function StepComorbidita({ value, onSet, ...c }: Common & { value: string[]; onS
           <span style={{ flex: 1, height: 1, background: "var(--line-100)" }} />
         </div>
         <OptionButton selected={value.includes("nessuna")} onClick={() => toggle("nessuna")}>Nessuna di queste</OptionButton>
+        <OptionButton selected={value.includes("ns")} onClick={() => toggle("ns")}>Non so / Preferisco non rispondere</OptionButton>
       </div>
     </QuestionFrame>
   );
