@@ -372,27 +372,102 @@ function StepFamSingle({ caption, question, subtitle, value, onSet, ...c }: Comm
   );
 }
 
-function StepFumo({ value, onSet, ...c }: Common & { value?: "si"|"no"|"ex"; onSet: (v: "si"|"no"|"ex") => void }) {
-  const [sel, setSel] = useState<"si"|"no"|null>(value === "si" ? "si" : value ? "no" : null);
-  const [past, setPast] = useState<"mai"|"smesso"|null>(value === "ex" ? "smesso" : value === "no" ? "mai" : null);
-  const canContinue = sel === "si" || (sel === "no" && !!past);
+const SIGARETTE_OPTS: [NonNullable<UserProfile["sigarette_giorno"]>, string][] = [
+  ["1_5", "da 1 a 5"], ["5_10", "da 5 a 10"],
+  ["10_20", "da 10 a 20"], ["20_30", "da 20 a 30"],
+  ["30_40", "da 30 a 40"], ["40_plus", "Più di 40"],
+];
+
+function NumberWheel({ label, value, min, max, onChange }: { label: string; value: number; min: number; max: number; onChange: (v: number) => void }) {
+  const prev = value > min ? value - 1 : null;
+  const next = value < max ? value + 1 : null;
+  const row = (n: number | null, active: boolean) => (
+    <div
+      onClick={() => n != null && !active && onChange(n)}
+      style={{
+        height: 56, display: "flex", alignItems: "center", justifyContent: "center",
+        cursor: n != null && !active ? "pointer" : "default",
+        fontFamily: "var(--font-display)", fontVariationSettings: "var(--font-display-settings)",
+        fontWeight: active ? 700 : 400,
+        fontSize: active ? 36 : 28,
+        color: active ? "var(--teal-900)" : "var(--ink-300)",
+        background: active ? "var(--teal-050)" : "transparent",
+        border: active ? "1.5px solid var(--teal-500)" : "1.5px solid transparent",
+        borderRadius: "var(--radius-md)",
+        margin: active ? "0 6px" : 0,
+      }}
+    >
+      {n ?? ""}
+    </div>
+  );
+  return (
+    <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4 }}>
+      <span style={{ textAlign: "center", fontFamily: "var(--font-sans)", fontSize: 13, fontWeight: 700,
+        letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--ink-500)", marginBottom: 6 }}>{label}</span>
+      <div style={{ border: "1.5px solid var(--line-200)", borderRadius: "var(--radius-md)", padding: "6px 0", background: "var(--surface-card)" }}>
+        {row(prev, false)}
+        {row(value, true)}
+        {row(next, false)}
+      </div>
+    </div>
+  );
+}
+
+function StepFumo({ profile, update, ...c }: Common & { profile: Partial<UserProfile>; update: (patch: Partial<UserProfile>) => void }) {
+  const [sel, setSel] = useState<"si"|"no"|null>(profile.fumo === "si" ? "si" : profile.fumo === "no" || profile.fumo === "ex" ? "no" : null);
+  const [past, setPast] = useState<"mai"|"smesso"|null>(profile.fumo === "ex" ? "smesso" : profile.fumo === "no" ? "mai" : null);
+  const [sig, setSig] = useState<UserProfile["sigarette_giorno"] | undefined>(profile.sigarette_giorno);
+  const [anni, setAnni] = useState<number>(profile.ex_smesso_anni ?? 2);
+  const [mesi, setMesi] = useState<number>(profile.ex_smesso_mesi ?? 3);
+
+  const canContinue =
+    (sel === "si" && !!sig) ||
+    (sel === "no" && past === "mai") ||
+    (sel === "no" && past === "smesso");
+
   const handleNext = () => {
-    if (sel === "si") onSet("si");
-    else if (past === "mai") onSet("no");
-    else if (past === "smesso") onSet("ex");
+    if (sel === "si") update({ fumo: "si", sigarette_giorno: sig, ex_smesso_anni: undefined, ex_smesso_mesi: undefined });
+    else if (past === "mai") update({ fumo: "no", sigarette_giorno: undefined, ex_smesso_anni: undefined, ex_smesso_mesi: undefined });
+    else if (past === "smesso") update({ fumo: "ex", sigarette_giorno: undefined, ex_smesso_anni: anni, ex_smesso_mesi: mesi });
     c.onContinue();
   };
+
   return (
-    <QuestionFrame {...c} onContinue={handleNext} question="Fumi?" canContinue={canContinue}>
+    <QuestionFrame {...c} onContinue={handleNext} question="Fumi?" subtitle="Sigarette o tabacco riscaldato." canContinue={canContinue}>
       <div style={{ display: "flex", gap: 12 }}>
         <div style={{ flex: 1 }}><OptionButton compact selected={sel === "si"} onClick={() => setSel("si")}>Sì</OptionButton></div>
         <div style={{ flex: 1 }}><OptionButton compact selected={sel === "no"} onClick={() => setSel("no")}>No</OptionButton></div>
       </div>
+
+      {sel === "si" && (
+        <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid var(--line-100)", display: "flex", flexDirection: "column", gap: 12 }}>
+          <FieldLabel>Quante al giorno, più o meno?</FieldLabel>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            {SIGARETTE_OPTS.map(([k,l]) => (
+              <OptionButton key={k} compact selected={sig === k} onClick={() => setSig(k)}>{l}</OptionButton>
+            ))}
+          </div>
+        </div>
+      )}
+
       {sel === "no" && (
         <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid var(--line-100)", display: "flex", flexDirection: "column", gap: 12 }}>
-          <FieldLabel>Hai mai fumato?</FieldLabel>
+          <FieldLabel>Hai mai fumato in passato?</FieldLabel>
           <OptionButton compact selected={past === "mai"} onClick={() => setPast("mai")}>No, non ho mai fumato</OptionButton>
           <OptionButton compact selected={past === "smesso"} onClick={() => setPast("smesso")}>Sì, ma ho smesso</OptionButton>
+
+          {past === "smesso" && (
+            <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 8 }}>
+              <FieldLabel>Da quanto hai smesso?</FieldLabel>
+              <div style={{ display: "flex", gap: 12 }}>
+                <NumberWheel label="Anni" value={anni} min={0} max={60} onChange={setAnni} />
+                <NumberWheel label="Mesi" value={mesi} min={0} max={11} onChange={setMesi} />
+              </div>
+              <p style={{ margin: "4px 0 0", textAlign: "center", fontFamily: "var(--font-sans)", fontSize: 14, color: "var(--teal-700)", fontWeight: 600 }}>
+                {anni} {anni === 1 ? "anno" : "anni"} · {mesi} {mesi === 1 ? "mese" : "mesi"}
+              </p>
+            </div>
+          )}
         </div>
       )}
     </QuestionFrame>
