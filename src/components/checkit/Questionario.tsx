@@ -337,18 +337,21 @@ function StepOncologica({ sesso, value, onSet, ...c }: Common & { sesso: "F"|"M"
 }
 
 function StepFamOnco({ value, onSet, ...c }: Common & { value: string[]; onSet: (v: string[]) => void }) {
-  const [sel, setSel] = useState<"si"|"no"|null>(value.length ? "si" : null);
+  const [sel, setSel] = useState<"si"|"no"|"ns"|null>(value.includes("ns") ? "ns" : value.length ? "si" : null);
   const opts: [string,string][] = [["colon","Colon-retto"],["mammella","Mammella"],["ovaio","Ovaio"],["altro","Altro"]];
-  const toggle = (k: string) => onSet(value.includes(k) ? value.filter(x => x !== k) : [...value, k]);
-  const canContinue = sel === "no" || (sel === "si" && value.length > 0);
+  const toggle = (k: string) => onSet(value.includes(k) ? value.filter(x => x !== k) : [...value.filter(x => x !== "ns"), k]);
+  const canContinue = sel === "no" || sel === "ns" || (sel === "si" && value.filter(v => v !== "ns").length > 0);
   return (
     <QuestionFrame {...c} question="Qualcuno nella tua famiglia ha ricevuto una diagnosi oncologica?" canContinue={canContinue}>
       <p style={{ margin: "-18px 0 18px", fontFamily: "var(--font-sans)", fontSize: 15, lineHeight: 1.45, color: "var(--ink-500)" }}>
         Considera i parenti più stretti: genitori, fratelli o sorelle, figli.
       </p>
       <div style={{ display: "flex", gap: 12 }}>
-        <div style={{ flex: 1 }}><OptionButton compact selected={sel === "si"} onClick={() => setSel("si")}>Sì</OptionButton></div>
+        <div style={{ flex: 1 }}><OptionButton compact selected={sel === "si"} onClick={() => { setSel("si"); onSet(value.filter(v => v !== "ns")); }}>Sì</OptionButton></div>
         <div style={{ flex: 1 }}><OptionButton compact selected={sel === "no"} onClick={() => { setSel("no"); onSet([]); }}>No</OptionButton></div>
+      </div>
+      <div style={{ marginTop: 12 }}>
+        <OptionButton compact selected={sel === "ns"} onClick={() => { setSel("ns"); onSet(["ns"]); }}>Non so / Preferisco non rispondere</OptionButton>
       </div>
       {sel === "si" && (
         <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid var(--line-100)", display: "flex", flexDirection: "column", gap: 10 }}>
