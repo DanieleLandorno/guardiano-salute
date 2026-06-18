@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useState, useRef, useEffect, type ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { QuestionFrame } from "@/components/checkit/QuestionFrame";
 import { OptionButton, FieldLabel, SoftSelect, StepperField, CheckGlyph } from "@/components/checkit/OptionButton";
