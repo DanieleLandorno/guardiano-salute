@@ -385,11 +385,11 @@ function NumberWheel({ label, value, min, max, onChange }: { label: string; valu
     <div
       onClick={() => n != null && !active && onChange(n)}
       style={{
-        height: 56, display: "flex", alignItems: "center", justifyContent: "center",
+        height: 40, display: "flex", alignItems: "center", justifyContent: "center",
         cursor: n != null && !active ? "pointer" : "default",
         fontFamily: "var(--font-display)", fontVariationSettings: "var(--font-display-settings)",
         fontWeight: active ? 700 : 400,
-        fontSize: active ? 36 : 28,
+        fontSize: active ? 24 : 18,
         color: active ? "var(--teal-900)" : "var(--ink-300)",
         background: active ? "var(--teal-050)" : "transparent",
         border: active ? "1.5px solid var(--teal-500)" : "1.5px solid transparent",
@@ -401,10 +401,10 @@ function NumberWheel({ label, value, min, max, onChange }: { label: string; valu
     </div>
   );
   return (
-    <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 4 }}>
-      <span style={{ textAlign: "center", fontFamily: "var(--font-sans)", fontSize: 13, fontWeight: 700,
-        letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--ink-500)", marginBottom: 6 }}>{label}</span>
-      <div style={{ border: "1.5px solid var(--line-200)", borderRadius: "var(--radius-md)", padding: "6px 0", background: "var(--surface-card)" }}>
+    <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
+      <span style={{ textAlign: "center", fontFamily: "var(--font-sans)", fontSize: 12, fontWeight: 700,
+        letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--ink-500)", marginBottom: 4 }}>{label}</span>
+      <div style={{ border: "1.5px solid var(--line-200)", borderRadius: "var(--radius-md)", padding: "4px 0", background: "var(--surface-card)" }}>
         {row(prev, false)}
         {row(value, true)}
         {row(next, false)}
@@ -452,19 +452,19 @@ function StepFumo({ profile, update, ...c }: Common & { profile: Partial<UserPro
       )}
 
       {sel === "no" && (
-        <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid var(--line-100)", display: "flex", flexDirection: "column", gap: 12 }}>
+        <div style={{ marginTop: 12, paddingTop: 12, borderTop: "1px solid var(--line-100)", display: "flex", flexDirection: "column", gap: 8 }}>
           <FieldLabel>Hai mai fumato in passato?</FieldLabel>
           <OptionButton compact selected={past === "mai"} onClick={() => setPast("mai")}>No, non ho mai fumato</OptionButton>
           <OptionButton compact selected={past === "smesso"} onClick={() => setPast("smesso")}>Sì, ma ho smesso</OptionButton>
 
           {past === "smesso" && (
-            <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 8 }}>
+            <div style={{ marginTop: 4, display: "flex", flexDirection: "column", gap: 6 }}>
               <FieldLabel>Da quanto hai smesso?</FieldLabel>
-              <div style={{ display: "flex", gap: 12 }}>
+              <div style={{ display: "flex", gap: 10 }}>
                 <NumberWheel label="Anni" value={anni} min={0} max={60} onChange={setAnni} />
                 <NumberWheel label="Mesi" value={mesi} min={0} max={11} onChange={setMesi} />
               </div>
-              <p style={{ margin: "4px 0 0", textAlign: "center", fontFamily: "var(--font-sans)", fontSize: 14, color: "var(--teal-700)", fontWeight: 600 }}>
+              <p style={{ margin: "2px 0 0", textAlign: "center", fontFamily: "var(--font-sans)", fontSize: 13, color: "var(--teal-700)", fontWeight: 600 }}>
                 {anni} {anni === 1 ? "anno" : "anni"} · {mesi} {mesi === 1 ? "mese" : "mesi"}
               </p>
             </div>
