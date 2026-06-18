@@ -550,12 +550,12 @@ function StepAttivita({ value, onSet, ...c }: Common & { value?: UserProfile["at
     ["raramente","Qualche volta al mese"],
     ["qualche","Almeno una volta a settimana"],
     ["spesso","Più volte a settimana"],
-    ["ns","Non so / Preferisco non rispondere"],
   ];
   return (
     <QuestionFrame {...c} question="Quanto spesso fai attività fisica?" canContinue={!!value}>
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         {opts.map(([k,l]) => <OptionButton key={k} selected={value === k} onClick={() => onSet(k)}>{l}</OptionButton>)}
+        <SkipButton selected={value === "ns"} onClick={() => onSet("ns")} />
       </div>
     </QuestionFrame>
   );
