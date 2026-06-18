@@ -433,7 +433,8 @@ function StepFumo({ profile, update, ...c }: Common & { profile: Partial<UserPro
   };
 
   return (
-    <QuestionFrame {...c} onContinue={handleNext} question="Fumi?" subtitle="Sigarette o tabacco riscaldato." canContinue={canContinue}>
+    <QuestionFrame {...c} onContinue={handleNext} question="Fumi?" canContinue={canContinue}>
+      <p style={{ margin: "-18px 0 18px", fontFamily: "var(--font-sans)", fontSize: 15, lineHeight: 1.45, color: "var(--ink-500)" }}>Sigarette o tabacco riscaldato.</p>
       <div style={{ display: "flex", gap: 12 }}>
         <div style={{ flex: 1 }}><OptionButton compact selected={sel === "si"} onClick={() => setSel("si")}>Sì</OptionButton></div>
         <div style={{ flex: 1 }}><OptionButton compact selected={sel === "no"} onClick={() => setSel("no")}>No</OptionButton></div>
