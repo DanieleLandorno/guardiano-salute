@@ -440,7 +440,7 @@ function NumberWheel({ label, value, min, max, onChange }: { label: string; valu
               color: v === value ? "var(--teal-900)" : "var(--ink-300)",
             }}
           >
-            {v}
+            {v === max && max === 15 ? "15+" : v}
           </div>
         ))}
         <div style={{ height: itemHeight }} />
