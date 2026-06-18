@@ -501,7 +501,7 @@ function StepFumo({ profile, update, ...c }: Common & { profile: Partial<UserPro
                 <NumberWheel label="Mesi" value={mesi} min={0} max={11} onChange={setMesi} />
               </div>
               <p style={{ margin: "2px 0 0", textAlign: "center", fontFamily: "var(--font-sans)", fontSize: 13, color: "var(--teal-700)", fontWeight: 600 }}>
-                {anni} {anni === 1 ? "anno" : "anni"} · {mesi} {mesi === 1 ? "mese" : "mesi"}
+                {anni >= 15 ? "15+ anni" : `${anni} ${anni === 1 ? "anno" : "anni"}`} · {mesi} {mesi === 1 ? "mese" : "mesi"}
               </p>
             </div>
           )}
