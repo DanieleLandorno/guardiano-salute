@@ -497,7 +497,7 @@ function StepFumo({ profile, update, ...c }: Common & { profile: Partial<UserPro
             <div style={{ marginTop: 4, display: "flex", flexDirection: "column", gap: 6 }}>
               <FieldLabel>Da quanto hai smesso?</FieldLabel>
               <div style={{ display: "flex", gap: 10 }}>
-                <NumberWheel label="Anni" value={anni} min={0} max={60} onChange={setAnni} />
+                <NumberWheel label="Anni" value={Math.min(anni, 15)} min={0} max={15} onChange={setAnni} />
                 <NumberWheel label="Mesi" value={mesi} min={0} max={11} onChange={setMesi} />
               </div>
               <p style={{ margin: "2px 0 0", textAlign: "center", fontFamily: "var(--font-sans)", fontSize: 13, color: "var(--teal-700)", fontWeight: 600 }}>
