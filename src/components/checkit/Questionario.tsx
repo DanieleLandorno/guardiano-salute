@@ -76,7 +76,7 @@ export function Questionario() {
       question="Qualcuno nella tua famiglia ha avuto malattie cardiovascolari precoci?"
       subtitle="Per esempio infarto o ictus prima dei 65 anni, nei parenti più stretti (genitori, fratelli o sorelle)."
       value={profile.familiarita_cardio} onSet={(v) => update({ familiarita_cardio: v })} />;
-    case "fumo": return <StepFumo {...common} value={profile.fumo} onSet={(v) => update({ fumo: v })} />;
+    case "fumo": return <StepFumo {...common} profile={profile} update={update} />;
     case "peso_altezza": return <StepPesoAltezza {...common} h={profile.altezza_cm ?? 168} w={profile.peso_kg ?? 64} onSet={(h, w) => update({ altezza_cm: h, peso_kg: w })} />;
     case "attivita": return <StepAttivita {...common} value={profile.attivita_fisica} onSet={(v) => update({ attivita_fisica: v })} />;
     case "pelle_a": return <StepSingleChoice {...common} question="Come descriveresti la tua pelle?"
