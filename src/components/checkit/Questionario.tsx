@@ -423,7 +423,12 @@ function StepPesoAltezza({ h: H0, w: W0, onSet, ...c }: Common & { h: number; w:
 }
 
 function StepAttivita({ value, onSet, ...c }: Common & { value?: UserProfile["attivita_fisica"]; onSet: (v: NonNullable<UserProfile["attivita_fisica"]>) => void }) {
-  const opts: [NonNullable<UserProfile["attivita_fisica"]>,string][] = [["mai","Mai"],["raramente","Raramente"],["qualche","Qualche volta"],["spesso","Spesso"]];
+  const opts: [NonNullable<UserProfile["attivita_fisica"]>,string][] = [
+    ["mai","Mai"],
+    ["raramente","Qualche volta al mese"],
+    ["qualche","Almeno una volta a settimana"],
+    ["spesso","Più volte a settimana"],
+  ];
   return (
     <QuestionFrame {...c} question="Quanto spesso fai attività fisica?" canContinue={!!value}>
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
