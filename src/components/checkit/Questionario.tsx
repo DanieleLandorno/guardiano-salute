@@ -315,7 +315,7 @@ function StepComorbidita({ value, onSet, ...c }: Common & { value: string[]; onS
           <span style={{ flex: 1, height: 1, background: "var(--line-100)" }} />
         </div>
         <OptionButton selected={value.includes("nessuna")} onClick={() => toggle("nessuna")}>Nessuna di queste</OptionButton>
-        <OptionButton selected={value.includes("ns")} onClick={() => toggle("ns")}>Non so / Preferisco non rispondere</OptionButton>
+        <SkipButton selected={value.includes("ns")} onClick={() => toggle("ns")} />
       </div>
     </QuestionFrame>
   );
