@@ -80,16 +80,14 @@ export function Questionario() {
     case "peso_altezza": return <StepPesoAltezza {...common} h={profile.altezza_cm ?? 168} w={profile.peso_kg ?? 64} onSet={(h, w) => update({ altezza_cm: h, peso_kg: w })} />;
     case "attivita": return <StepAttivita {...common} value={profile.attivita_fisica} onSet={(v) => update({ attivita_fisica: v })} />;
     case "pelle_a": return <StepSingleChoice {...common} question="Come descriveresti la tua pelle?"
-      opts={[["chiara","Chiara (mi scotto facilmente al sole)"],["media","Media"],["scura","Scura (mi scotto raramente)"]]}
-      value={profile.pelle} onSet={(v) => update({ pelle: v as any })} cta="Avanti" ctaVariant="soft"
-      aboveTitle={<SkinSectionHeader n={1} />} />;
+      opts={[["chiara","Chiara (mi scotto facilmente al sole)"],["media","Media"],["scura","Scura (mi scotto raramente)"],["ns","Non so / Preferisco non rispondere"]]}
+      value={profile.pelle} onSet={(v) => update({ pelle: v as any })} />;
     case "pelle_b": return <StepSingleChoice {...common} question="Hai molti nei sul corpo?"
-      opts={[["pochi","Pochi"],["diversi","Diversi"],["molti","Molti o non saprei"]]}
-      value={profile.nei} onSet={(v) => update({ nei: v as any })} cta="Avanti" ctaVariant="soft"
-      aboveTitle={<SkinSectionHeader n={2} />} />;
+      opts={[["pochi","Pochi"],["diversi","Diversi"],["molti","Molti o non saprei"],["ns","Non so / Preferisco non rispondere"]]}
+      value={profile.nei} onSet={(v) => update({ nei: v as any })} />;
     case "pelle_c": return <StepSingleChoice {...common} question="Quanto ti esponi al sole?"
-      opts={[["poco","Poco"],["moderato","Moderatamente"],["molto","Molto (sole intenso, lampade, lavoro all’aperto)"]]}
-      value={profile.sole} onSet={(v) => update({ sole: v as any })} aboveTitle={<SkinSectionHeader n={3} />} />;
+      opts={[["poco","Poco"],["moderato","Moderatamente"],["molto","Molto (sole intenso, lampade, lavoro all’aperto)"],["ns","Non so / Preferisco non rispondere"]]}
+      value={profile.sole} onSet={(v) => update({ sole: v as any })} />;
     case "hpv": return <StepHpv {...common} value={profile.vaccinazione_hpv} onSet={(v) => update({ vaccinazione_hpv: v })} />;
     case "cervicale": return <StepScreeningGenerico {...common}
       screeningId="cervice_uterina"
@@ -289,9 +287,10 @@ function StepRegione({ value, onSet, ...c }: Common & { value?: string; onSet: (
 
 function StepComorbidita({ value, onSet, ...c }: Common & { value: string[]; onSet: (v: string[]) => void }) {
   const opts: [string,string][] = [["ipertensione","Ipertensione"],["diabete","Diabete"],["colesterolo","Colesterolo o trigliceridi alti"]];
+  const EXCLUSIVE = ["nessuna", "ns"];
   const toggle = (k: string) => {
-    if (k === "nessuna") { onSet(value.includes("nessuna") ? [] : ["nessuna"]); return; }
-    const next = value.filter((x) => x !== "nessuna");
+    if (EXCLUSIVE.includes(k)) { onSet(value.includes(k) ? [] : [k]); return; }
+    const next = value.filter((x) => !EXCLUSIVE.includes(x));
     onSet(next.includes(k) ? next.filter((x) => x !== k) : [...next, k]);
   };
   return (
@@ -304,6 +303,7 @@ function StepComorbidita({ value, onSet, ...c }: Common & { value: string[]; onS
           <span style={{ flex: 1, height: 1, background: "var(--line-100)" }} />
         </div>
         <OptionButton selected={value.includes("nessuna")} onClick={() => toggle("nessuna")}>Nessuna di queste</OptionButton>
+        <OptionButton selected={value.includes("ns")} onClick={() => toggle("ns")}>Non so / Preferisco non rispondere</OptionButton>
       </div>
     </QuestionFrame>
   );
@@ -337,18 +337,21 @@ function StepOncologica({ sesso, value, onSet, ...c }: Common & { sesso: "F"|"M"
 }
 
 function StepFamOnco({ value, onSet, ...c }: Common & { value: string[]; onSet: (v: string[]) => void }) {
-  const [sel, setSel] = useState<"si"|"no"|null>(value.length ? "si" : null);
+  const [sel, setSel] = useState<"si"|"no"|"ns"|null>(value.includes("ns") ? "ns" : value.length ? "si" : null);
   const opts: [string,string][] = [["colon","Colon-retto"],["mammella","Mammella"],["ovaio","Ovaio"],["altro","Altro"]];
-  const toggle = (k: string) => onSet(value.includes(k) ? value.filter(x => x !== k) : [...value, k]);
-  const canContinue = sel === "no" || (sel === "si" && value.length > 0);
+  const toggle = (k: string) => onSet(value.includes(k) ? value.filter(x => x !== k) : [...value.filter(x => x !== "ns"), k]);
+  const canContinue = sel === "no" || sel === "ns" || (sel === "si" && value.filter(v => v !== "ns").length > 0);
   return (
     <QuestionFrame {...c} question="Qualcuno nella tua famiglia ha ricevuto una diagnosi oncologica?" canContinue={canContinue}>
       <p style={{ margin: "-18px 0 18px", fontFamily: "var(--font-sans)", fontSize: 15, lineHeight: 1.45, color: "var(--ink-500)" }}>
         Considera i parenti più stretti: genitori, fratelli o sorelle, figli.
       </p>
       <div style={{ display: "flex", gap: 12 }}>
-        <div style={{ flex: 1 }}><OptionButton compact selected={sel === "si"} onClick={() => setSel("si")}>Sì</OptionButton></div>
+        <div style={{ flex: 1 }}><OptionButton compact selected={sel === "si"} onClick={() => { setSel("si"); onSet(value.filter(v => v !== "ns")); }}>Sì</OptionButton></div>
         <div style={{ flex: 1 }}><OptionButton compact selected={sel === "no"} onClick={() => { setSel("no"); onSet([]); }}>No</OptionButton></div>
+      </div>
+      <div style={{ marginTop: 12 }}>
+        <OptionButton compact selected={sel === "ns"} onClick={() => { setSel("ns"); onSet(["ns"]); }}>Non so / Preferisco non rispondere</OptionButton>
       </div>
       {sel === "si" && (
         <div style={{ marginTop: 16, paddingTop: 16, borderTop: "1px solid var(--line-100)", display: "flex", flexDirection: "column", gap: 10 }}>
@@ -437,7 +440,7 @@ function NumberWheel({ label, value, min, max, onChange }: { label: string; valu
               color: v === value ? "var(--teal-900)" : "var(--ink-300)",
             }}
           >
-            {v}
+            {v === max && max === 15 ? "15+" : v}
           </div>
         ))}
         <div style={{ height: itemHeight }} />
@@ -494,11 +497,11 @@ function StepFumo({ profile, update, ...c }: Common & { profile: Partial<UserPro
             <div style={{ marginTop: 4, display: "flex", flexDirection: "column", gap: 6 }}>
               <FieldLabel>Da quanto hai smesso?</FieldLabel>
               <div style={{ display: "flex", gap: 10 }}>
-                <NumberWheel label="Anni" value={anni} min={0} max={60} onChange={setAnni} />
+                <NumberWheel label="Anni" value={Math.min(anni, 15)} min={0} max={15} onChange={setAnni} />
                 <NumberWheel label="Mesi" value={mesi} min={0} max={11} onChange={setMesi} />
               </div>
               <p style={{ margin: "2px 0 0", textAlign: "center", fontFamily: "var(--font-sans)", fontSize: 13, color: "var(--teal-700)", fontWeight: 600 }}>
-                {anni} {anni === 1 ? "anno" : "anni"} · {mesi} {mesi === 1 ? "mese" : "mesi"}
+                {anni >= 15 ? "15+ anni" : `${anni} ${anni === 1 ? "anno" : "anni"}`} · {mesi} {mesi === 1 ? "mese" : "mesi"}
               </p>
             </div>
           )}
@@ -537,6 +540,7 @@ function StepAttivita({ value, onSet, ...c }: Common & { value?: UserProfile["at
     ["raramente","Qualche volta al mese"],
     ["qualche","Almeno una volta a settimana"],
     ["spesso","Più volte a settimana"],
+    ["ns","Non so / Preferisco non rispondere"],
   ];
   return (
     <QuestionFrame {...c} question="Quanto spesso fai attività fisica?" canContinue={!!value}>

@@ -24,15 +24,15 @@ export interface UserProfile {
   sigarette_giorno?: "1_5" | "5_10" | "10_20" | "20_30" | "30_40" | "40_plus";
   ex_smesso_anni?: number;
   ex_smesso_mesi?: number;
-  attivita_fisica?: "mai" | "raramente" | "qualche" | "spesso";
+  attivita_fisica?: "mai" | "raramente" | "qualche" | "spesso" | "ns";
   altezza_cm?: number | null;
   peso_kg?: number | null;
   familiarita_oncologica?: string[];
   familiarita_diabete?: "si" | "no" | "ns";
   familiarita_cardio?: "si" | "no" | "ns";
-  pelle?: "chiara" | "media" | "scura";
-  nei?: "pochi" | "diversi" | "molti";
-  sole?: "poco" | "moderato" | "molto";
+  pelle?: "chiara" | "media" | "scura" | "ns";
+  nei?: "pochi" | "diversi" | "molti" | "ns";
+  sole?: "poco" | "moderato" | "molto" | "ns";
 }
 
 export const RULES_JSON = {
