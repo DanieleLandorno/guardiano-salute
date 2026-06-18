@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useState, useRef, useEffect, type ReactNode } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { QuestionFrame } from "@/components/checkit/QuestionFrame";
 import { OptionButton, FieldLabel, SoftSelect, StepperField, CheckGlyph } from "@/components/checkit/OptionButton";
@@ -295,7 +295,7 @@ function StepComorbidita({ value, onSet, ...c }: Common & { value: string[]; onS
     onSet(next.includes(k) ? next.filter((x) => x !== k) : [...next, k]);
   };
   return (
-    <QuestionFrame {...c} question="Ti è mai stata diagnosticata una di queste condizioni?">
+    <QuestionFrame {...c} question="Ti è mai stata diagnosticata una di queste condizioni?" canContinue={value.length > 0}>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {opts.map(([k,l]) => <OptionButton key={k} multi selected={value.includes(k)} onClick={() => toggle(k)}>{l}</OptionButton>)}
         <div style={{ display: "flex", alignItems: "center", gap: 14, margin: "4px 2px" }}>
@@ -379,35 +379,68 @@ const SIGARETTE_OPTS: [NonNullable<UserProfile["sigarette_giorno"]>, string][] =
 ];
 
 function NumberWheel({ label, value, min, max, onChange }: { label: string; value: number; min: number; max: number; onChange: (v: number) => void }) {
-  const prev = value > min ? value - 1 : null;
-  const next = value < max ? value + 1 : null;
-  const row = (n: number | null, active: boolean) => (
-    <div
-      onClick={() => n != null && !active && onChange(n)}
-      style={{
-        height: 40, display: "flex", alignItems: "center", justifyContent: "center",
-        cursor: n != null && !active ? "pointer" : "default",
-        fontFamily: "var(--font-display)", fontVariationSettings: "var(--font-display-settings)",
-        fontWeight: active ? 700 : 400,
-        fontSize: active ? 24 : 18,
-        color: active ? "var(--teal-900)" : "var(--ink-300)",
-        background: active ? "var(--teal-050)" : "transparent",
-        border: active ? "1.5px solid var(--teal-500)" : "1.5px solid transparent",
-        borderRadius: "var(--radius-md)",
-        margin: active ? "0 6px" : 0,
-      }}
-    >
-      {n ?? ""}
-    </div>
-  );
+  const containerRef = useRef<HTMLDivElement>(null);
+  const itemHeight = 36;
+  const values = Array.from({ length: max - min + 1 }, (_, i) => min + i);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      const idx = value - min;
+      containerRef.current.scrollTop = idx * itemHeight;
+    }
+  }, [value, min]);
+
+  const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleScroll = () => {
+    if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    scrollTimeoutRef.current = setTimeout(() => {
+      if (!containerRef.current) return;
+      const idx = Math.round(containerRef.current.scrollTop / itemHeight);
+      const newVal = Math.min(max, Math.max(min, min + idx));
+      if (newVal !== value) onChange(newVal);
+    }, 80);
+  };
+
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 2 }}>
       <span style={{ textAlign: "center", fontFamily: "var(--font-sans)", fontSize: 12, fontWeight: 700,
         letterSpacing: "0.06em", textTransform: "uppercase", color: "var(--ink-500)", marginBottom: 4 }}>{label}</span>
-      <div style={{ border: "1.5px solid var(--line-200)", borderRadius: "var(--radius-md)", padding: "4px 0", background: "var(--surface-card)" }}>
-        {row(prev, false)}
-        {row(value, true)}
-        {row(next, false)}
+      <div
+        ref={containerRef}
+        onScroll={handleScroll}
+        className="hide-scrollbar"
+        style={{
+          height: itemHeight * 3,
+          overflowY: "auto",
+          scrollSnapType: "y mandatory",
+          WebkitOverflowScrolling: "touch",
+          border: "1.5px solid var(--line-200)",
+          borderRadius: "var(--radius-md)",
+          background: "var(--surface-card)",
+        }}
+      >
+        <div style={{ height: itemHeight }} />
+        {values.map((v) => (
+          <div
+            key={v}
+            style={{
+              height: itemHeight,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              scrollSnapAlign: "center",
+              fontFamily: "var(--font-display)",
+              fontVariationSettings: "var(--font-display-settings)",
+              fontWeight: v === value ? 700 : 400,
+              fontSize: v === value ? 22 : 16,
+              color: v === value ? "var(--teal-900)" : "var(--ink-300)",
+            }}
+          >
+            {v}
+          </div>
+        ))}
+        <div style={{ height: itemHeight }} />
       </div>
     </div>
   );
