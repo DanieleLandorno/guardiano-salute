@@ -399,11 +399,11 @@ const SIGARETTE_OPTS: [NonNullable<UserProfile["sigarette_giorno"]>, string][] =
   ["30_40", "da 30 a 40"], ["40_plus", "Più di 40"],
 ];
 const FUMA_DA_OPTS: [NonNullable<UserProfile["fuma_da"]>, string][] = [
-  ["meno_1", "Meno di 1 anno"],
-  ["1_5", "Da 1 a 5 anni"],
-  ["6_10", "Da 6 a 10 anni"],
-  ["11_20", "Da 11 a 20 anni"],
-  ["oltre_20", "Oltre 20 anni"],
+  ["meno_1", "Meno di 1"],
+  ["1_5", "Da 1 a 5"],
+  ["6_10", "Da 6 a 10"],
+  ["11_20", "Da 11 a 20"],
+  ["oltre_20", "Oltre 20"],
 ];
 
 function NumberWheel({ label, value, min, max, onChange }: { label: string; value: number; min: number; max: number; onChange: (v: number) => void }) {
