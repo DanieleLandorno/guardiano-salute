@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useState, type ReactNode } from "react";
 import type { UserProfile } from "./rules";
 
 const KEY = "checkit-profile-v1";
@@ -15,26 +15,39 @@ interface Ctx {
 
 const ProfileContext = createContext<Ctx | null>(null);
 
-export function ProfileProvider({ children }: { children: ReactNode }) {
-  const [profile, setProfile] = useState<Partial<UserProfile>>({});
+function persist(p: Partial<UserProfile>) {
+  try { sessionStorage.setItem(KEY, JSON.stringify(p)); } catch {}
+}
 
-  useEffect(() => {
+export function ProfileProvider({ children }: { children: ReactNode }) {
+  const [profile, setProfile] = useState<Partial<UserProfile>>(() => {
     try {
       const raw = sessionStorage.getItem(KEY);
-      if (raw) setProfile(JSON.parse(raw));
-    } catch {}
-  }, []);
-  useEffect(() => {
-    try { sessionStorage.setItem(KEY, JSON.stringify(profile)); } catch {}
-  }, [profile]);
+      return raw ? JSON.parse(raw) : {};
+    } catch { return {}; }
+  });
 
-  const update = (patch: Partial<UserProfile>) => setProfile((p) => ({ ...p, ...patch }));
+  const update = (patch: Partial<UserProfile>) =>
+    setProfile((p) => {
+      const next = { ...p, ...patch };
+      persist(next);
+      return next;
+    });
+
   const setScreening: Ctx["setScreening"] = (id, patch) =>
-    setProfile((p) => ({
-      ...p,
-      screenings: { ...(p.screenings ?? {}), [id]: { ...(p.screenings?.[id] ?? {}), ...patch } },
-    }));
-  const reset = () => setProfile({});
+    setProfile((p) => {
+      const next = {
+        ...p,
+        screenings: { ...(p.screenings ?? {}), [id]: { ...(p.screenings?.[id] ?? {}), ...patch } },
+      };
+      persist(next);
+      return next;
+    });
+
+  const reset = () => {
+    setProfile({});
+    persist({});
+  };
 
   return <ProfileContext.Provider value={{ profile, update, setScreening, reset }}>{children}</ProfileContext.Provider>;
 }
