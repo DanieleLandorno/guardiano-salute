@@ -89,13 +89,13 @@ export function Questionario() {
     case "peso_altezza": return <StepPesoAltezza {...common} h={profile.altezza_cm ?? 168} w={profile.peso_kg ?? 64} onSet={(h, w) => update({ altezza_cm: h, peso_kg: w })} />;
     case "attivita": return <StepAttivita {...common} value={profile.attivita_fisica} onSet={(v) => update({ attivita_fisica: v })} />;
     case "pelle_a": return <StepSingleChoice {...common} question="Come descriveresti la tua pelle?"
-      opts={[["chiara","Chiara (mi scotto facilmente al sole)"],["media","Media"],["scura","Scura (mi scotto raramente)"],["ns","Non so / Preferisco non rispondere"]]}
+      opts={[["chiara","Chiara","Mi scotto facilmente, mi abbronzo poco"],["media","Media","Mi scotto a volte, mi abbronzo gradualmente"],["scura","Scura","Mi scotto raramente, mi abbronzo facilmente"],["ns","Non so / Preferisco non rispondere"]]}
       value={profile.pelle} onSet={(v) => update({ pelle: v as any })} />;
     case "pelle_b": return <StepSingleChoice {...common} question="Hai molti nei sul corpo?"
-      opts={[["pochi","Pochi"],["diversi","Diversi"],["molti","Molti o non saprei"],["ns","Non so / Preferisco non rispondere"]]}
+      opts={[["pochi","Pochi"],["diversi","Diversi"],["molti","Molti"],["ns","Non so / Preferisco non rispondere"]]}
       value={profile.nei} onSet={(v) => update({ nei: v as any })} />;
     case "pelle_c": return <StepSingleChoice {...common} question="Quanto ti esponi al sole?"
-      opts={[["poco","Poco"],["moderato","Moderatamente"],["molto","Molto (sole intenso, lampade, lavoro all’aperto)"],["ns","Non so / Preferisco non rispondere"]]}
+      opts={[["poco","Raramente","Quasi sempre al chiuso"],["moderato","Qualche volta a settimana","Passeggiate, sport, attività all’aperto"],["molto","Quasi ogni giorno","Sole intenso, lampade, o lavoro all’aperto"],["ns","Non so / Preferisco non rispondere"]]}
       value={profile.sole} onSet={(v) => update({ sole: v as any })} />;
     case "hpv": return <StepHpv {...common} value={profile.vaccinazione_hpv} onSet={(v) => update({ vaccinazione_hpv: v })} />;
     case "cervicale": return <StepScreeningGenerico {...common}
