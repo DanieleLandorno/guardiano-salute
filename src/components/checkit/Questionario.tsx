@@ -98,21 +98,21 @@ export function Questionario() {
       opts={[["poco","Raramente","Quasi sempre al chiuso"],["moderato","Qualche volta a settimana","Passeggiate, sport, attività all’aperto"],["molto","Quasi ogni giorno","Sole intenso, lampade, o lavoro all’aperto"],["ns","Non so / Preferisco non rispondere"]]}
       value={profile.sole} onSet={(v) => update({ sole: v as any })} />;
     case "hpv": return <StepHpv {...common} value={profile.vaccinazione_hpv} onSet={(v) => update({ vaccinazione_hpv: v })} />;
-    case "cervicale": return <StepScreeningGenerico {...common}
+    case "cervicale": return <StepScreeningGenerico key="cervice_uterina" {...common}
       screeningId="cervice_uterina"
       question="Hai mai fatto uno screening per la cervice uterina?"
       subtitle="Pap test o HPV-DNA test."
       withTipoOpts={[["pap_test","Pap test"],["hpv_dna","HPV-DNA test"],["ns","Non lo so"]]}
       defaultCadenceMonths={36}
       onSetScreening={setScreening} state={profile.screenings?.["cervice_uterina"] ?? {}} />;
-    case "mammografia": return <StepScreeningGenerico {...common}
+    case "mammografia": return <StepScreeningGenerico key="mammella" {...common}
       screeningId="mammella"
       question="Hai mai fatto una mammografia?"
       defaultCadenceMonths={24}
       onSetScreening={setScreening} state={profile.screenings?.["mammella"] ?? {}} />;
-    case "psa": return <StepPsa {...common}
+    case "psa": return <StepPsa key="prostata" {...common}
       onSetScreening={setScreening} state={profile.screenings?.["prostata"] ?? {}} />;
-    case "colon": return <StepScreeningGenerico {...common}
+    case "colon": return <StepScreeningGenerico key="colon_retto" {...common}
       screeningId="colon_retto"
       question="Hai mai fatto uno screening per il colon-retto?"
       subtitle="Test del sangue occulto fecale o colonscopia."
@@ -358,16 +358,16 @@ function StepOncologica({ sesso, value, onSet, ...c }: Common & { sesso: "F"|"M"
 
 function StepFamOnco({ value, onSet, ...c }: Common & { value: string[]; onSet: (v: string[]) => void }) {
   const [sel, setSel] = useState<"si"|"no"|"ns"|null>(value.includes("ns") ? "ns" : value.length ? "si" : null);
-  const opts: [string,string][] = [["colon","Colon-retto"],["mammella","Mammella"]];
+  const opts: [string,string][] = [["colon","Colon-retto"],["mammella","Mammella"],["ovaio","Ovaio"]];
   const toggle = (k: string) => onSet(value.includes(k) ? value.filter(x => x !== k) : [...value.filter(x => x !== "ns"), k]);
   const canContinue = sel === "no" || sel === "ns" || (sel === "si" && value.filter(v => v !== "ns").length > 0);
   return (
     <QuestionFrame {...c} question="Qualcuno nella tua famiglia ha ricevuto una diagnosi oncologica?" canContinue={canContinue}>
       <div style={{
-        marginBottom: 26, padding: "16px 18px", borderRadius: "var(--radius-lg)",
+        marginBottom: 16, padding: "10px 14px", borderRadius: "var(--radius-md)",
         background: "var(--teal-050)", border: "1px solid var(--teal-100)",
       }}>
-        <p style={{ margin: 0, fontFamily: "var(--font-sans)", fontSize: 16, lineHeight: 1.5, color: "var(--teal-900)" }}>
+        <p style={{ margin: 0, fontFamily: "var(--font-sans)", fontSize: 14.5, lineHeight: 1.4, color: "var(--teal-900)" }}>
           Considera i parenti più stretti: genitori, fratelli o sorelle, figli.
         </p>
       </div>
@@ -601,7 +601,7 @@ function StepSingleChoice({
     <QuestionFrame {...c} question={question} canContinue={!!value} aboveTitle={aboveTitle} cta={cta} ctaVariant={ctaVariant}>
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         {opts.filter(([k]) => k !== "ns").map(([k,l,desc]) => (
-          <OptionButton key={k} selected={value === k} onClick={() => onSet(k)} sub={desc ? <span style={{ fontSize: 13, fontWeight: 400, color: "var(--ink-400)" }}>{desc}</span> : undefined}>{l}</OptionButton>
+          <OptionButton key={k} selected={value === k} onClick={() => onSet(k)} sub={desc ? <span style={{ display: "block", marginTop: 3, fontSize: 15, lineHeight: 1.4, fontWeight: 400, color: "var(--ink-600)" }}>{desc}</span> : undefined}>{l}</OptionButton>
         ))}
         {opts.some(([k]) => k === "ns") && <SkipButton selected={value === "ns"} onClick={() => onSet("ns")} />}
       </div>
@@ -644,6 +644,7 @@ function StepScreeningGenerico({
   const [month, setMonth] = useState<string>(state.ultimo_test_data?.split("-")[1] ? MONTHS[Number(state.ultimo_test_data.split("-")[1]) - 1] : "");
   const [year, setYear] = useState<string | number>(state.ultimo_test_data?.split("-")[0] ?? "");
   const [esito, setEsito] = useState<"negativo"|"positivo"|"non_ricordo"|null>(state.ultimo_test_esito ?? null);
+  const [dataDaCompletare, setDataDaCompletare] = useState<boolean>(!!state.data_da_completare);
 
   const tipoCad = tipo === "pap_test" ? 36 : tipo === "hpv_dna" ? 60 : defaultCadenceMonths;
   const cadence = withTipoOpts ? Math.round(tipoCad / 12) : Math.round(defaultCadenceMonths / 12);
@@ -651,12 +652,14 @@ function StepScreeningGenerico({
   const valid = dateSet && (2026 - Number(year)) <= cadence;
   const showTipo = sel === "si" && !!withTipoOpts;
   const showDate = sel === "si" && (!withTipoOpts || !!tipo);
-  const showEsito = showDate && dateSet;
-  const canContinue = sel === "no" || (showDate && (!valid || !!esito));
+  const showEsito = showDate && dateSet && !dataDaCompletare;
+  const canContinue = sel === "no" || (showDate && (dataDaCompletare || (dateSet && (!valid || !!esito))));
 
   const handleNext = () => {
-    if (sel === "no") onSetScreening(screeningId, { fatto: false, ultimo_test_data: null, ultimo_test_esito: null, ultimo_test_tipo: null });
-    else {
+    if (sel === "no") onSetScreening(screeningId, { fatto: false, ultimo_test_data: null, ultimo_test_esito: null, ultimo_test_tipo: null, data_da_completare: false });
+    else if (dataDaCompletare) {
+      onSetScreening(screeningId, { fatto: true, ultimo_test_tipo: tipo, ultimo_test_data: null, ultimo_test_esito: null, data_da_completare: true });
+    } else {
       const monthIdx = MONTHS.indexOf(month) + 1;
       const dataStr = year && monthIdx > 0 ? `${year}-${String(monthIdx).padStart(2, "0")}` : null;
       onSetScreening(screeningId, {
@@ -664,6 +667,7 @@ function StepScreeningGenerico({
         ultimo_test_tipo: tipo,
         ultimo_test_data: dataStr,
         ultimo_test_esito: esito,
+        data_da_completare: false,
       });
     }
     c.onContinue();
@@ -703,11 +707,18 @@ function StepScreeningGenerico({
           )}
           {showDate && (
             <div>
-              <FieldLabel>Quando l'hai fatto?</FieldLabel>
-              <div style={{ display: "flex", gap: 10 }}>
+              <FieldLabel>Quando hai fatto l'<strong style={{ color: "var(--teal-700)", fontWeight: 800 }}>ULTIMO</strong> test?</FieldLabel>
+              <div style={{ display: "flex", gap: 10, opacity: dataDaCompletare ? 0.4 : 1, pointerEvents: dataDaCompletare ? "none" : "auto" }}>
                 <SoftSelect placeholder="Mese" value={month} onChange={(e) => setMonth(e.target.value)}>{MONTHS.map((m) => <option key={m} value={m}>{m}</option>)}</SoftSelect>
                 <SoftSelect placeholder="Anno" value={year} onChange={(e) => setYear(Number(e.target.value))}>{YEARS.map((y) => <option key={y} value={y}>{y}</option>)}</SoftSelect>
               </div>
+              <button type="button" onClick={() => setDataDaCompletare((v) => !v)} style={{
+                marginTop: 12, width: "100%", padding: 12, cursor: "pointer", borderRadius: "var(--radius-md)",
+                border: dataDaCompletare ? "1.5px solid var(--teal-500)" : "1.5px solid transparent",
+                background: dataDaCompletare ? "var(--teal-050)" : "transparent",
+                fontFamily: "var(--font-sans)", fontSize: 15, fontWeight: 600,
+                color: dataDaCompletare ? "var(--teal-700)" : "var(--ink-500)",
+              }}>Non ricordo la data, la inserisco più avanti</button>
             </div>
           )}
           {showEsito && (valid ? (
@@ -717,13 +728,6 @@ function StepScreeningGenerico({
                 <EsitoPill k="negativo" label="Negativo" dot="var(--teal-500)" />
                 <EsitoPill k="positivo" label="Positivo" dot="var(--amber-500)" />
               </div>
-              <button type="button" onClick={() => setEsito("non_ricordo")} style={{
-                marginTop: 12, width: "100%", padding: 12, cursor: "pointer", borderRadius: "var(--radius-md)",
-                border: esito === "non_ricordo" ? "1.5px solid var(--teal-500)" : "1.5px solid transparent",
-                background: esito === "non_ricordo" ? "var(--teal-050)" : "transparent",
-                fontFamily: "var(--font-sans)", fontSize: 15, fontWeight: 600,
-                color: esito === "non_ricordo" ? "var(--teal-700)" : "var(--ink-500)",
-              }}>Non lo ricordo</button>
             </div>
           ) : (
             <div style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "14px 16px", borderRadius: "var(--radius-md)", background: "var(--teal-050)", border: "1px solid var(--teal-100)" }}>
@@ -775,7 +779,7 @@ function StepPsa({ onSetScreening, state, ...c }: Common & { onSetScreening: (id
       {sel === "si" && (
         <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid var(--line-100)", display: "flex", flexDirection: "column", gap: 20 }}>
           <div>
-            <FieldLabel>Quando l'hai fatto?</FieldLabel>
+            <FieldLabel>Quando hai fatto l'<strong style={{ color: "var(--teal-700)", fontWeight: 800 }}>ULTIMO</strong> test?</FieldLabel>
             <div style={{ display: "flex", gap: 10 }}>
               <SoftSelect placeholder="Mese" value={month} onChange={(e) => setMonth(e.target.value)}>{MONTHS.map((m) => <option key={m} value={m}>{m}</option>)}</SoftSelect>
               <SoftSelect placeholder="Anno" value={year} onChange={(e) => setYear(Number(e.target.value))}>{YEARS.map((y) => <option key={y} value={y}>{y}</option>)}</SoftSelect>
