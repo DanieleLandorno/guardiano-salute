@@ -779,7 +779,7 @@ function StepPsa({ onSetScreening, state, ...c }: Common & { onSetScreening: (id
       {sel === "si" && (
         <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid var(--line-100)", display: "flex", flexDirection: "column", gap: 20 }}>
           <div>
-            <FieldLabel>Quando l'hai fatto?</FieldLabel>
+            <FieldLabel>Quando hai fatto l'<strong style={{ color: "var(--teal-700)", fontWeight: 800 }}>ULTIMO</strong> test?</FieldLabel>
             <div style={{ display: "flex", gap: 10 }}>
               <SoftSelect placeholder="Mese" value={month} onChange={(e) => setMonth(e.target.value)}>{MONTHS.map((m) => <option key={m} value={m}>{m}</option>)}</SoftSelect>
               <SoftSelect placeholder="Anno" value={year} onChange={(e) => setYear(Number(e.target.value))}>{YEARS.map((y) => <option key={y} value={y}>{y}</option>)}</SoftSelect>
