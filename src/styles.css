@@ -150,3 +150,46 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* PSA slider — teal styled range input */
+.psa-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--teal-500) var(--psa-progress, 0%), var(--teal-100) var(--psa-progress, 0%));
+  outline: none;
+  border: none;
+}
+.psa-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2.5px solid var(--teal-500);
+  cursor: pointer;
+  margin-top: -10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+}
+.psa-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: transparent;
+}
+.psa-slider::-moz-range-thumb {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2.5px solid var(--teal-500);
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.12);
+}
+.psa-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: transparent;
+}
