@@ -504,7 +504,7 @@ function StepFumo({ profile, update, ...c }: Common & { profile: Partial<UserPro
 
       {sel === "si" && (
         <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid var(--line-100)", display: "flex", flexDirection: "column", gap: 12 }}>
-          <FieldLabel>Da quanto tempo fumi?</FieldLabel>
+          <FieldLabel>Da quanti anni fumi?</FieldLabel>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             {FUMA_DA_OPTS.map(([k,l]) => (
               <OptionButton key={k} compact selected={fumaDa === k} onClick={() => setFumaDa(k)}>{l}</OptionButton>
