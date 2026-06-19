@@ -358,16 +358,16 @@ function StepOncologica({ sesso, value, onSet, ...c }: Common & { sesso: "F"|"M"
 
 function StepFamOnco({ value, onSet, ...c }: Common & { value: string[]; onSet: (v: string[]) => void }) {
   const [sel, setSel] = useState<"si"|"no"|"ns"|null>(value.includes("ns") ? "ns" : value.length ? "si" : null);
-  const opts: [string,string][] = [["colon","Colon-retto"],["mammella","Mammella"]];
+  const opts: [string,string][] = [["colon","Colon-retto"],["mammella","Mammella"],["ovaio","Ovaio"]];
   const toggle = (k: string) => onSet(value.includes(k) ? value.filter(x => x !== k) : [...value.filter(x => x !== "ns"), k]);
   const canContinue = sel === "no" || sel === "ns" || (sel === "si" && value.filter(v => v !== "ns").length > 0);
   return (
     <QuestionFrame {...c} question="Qualcuno nella tua famiglia ha ricevuto una diagnosi oncologica?" canContinue={canContinue}>
       <div style={{
-        marginBottom: 26, padding: "16px 18px", borderRadius: "var(--radius-lg)",
+        marginBottom: 16, padding: "10px 14px", borderRadius: "var(--radius-md)",
         background: "var(--teal-050)", border: "1px solid var(--teal-100)",
       }}>
-        <p style={{ margin: 0, fontFamily: "var(--font-sans)", fontSize: 16, lineHeight: 1.5, color: "var(--teal-900)" }}>
+        <p style={{ margin: 0, fontFamily: "var(--font-sans)", fontSize: 14.5, lineHeight: 1.4, color: "var(--teal-900)" }}>
           Considera i parenti più stretti: genitori, fratelli o sorelle, figli.
         </p>
       </div>
