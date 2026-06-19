@@ -398,6 +398,13 @@ const SIGARETTE_OPTS: [NonNullable<UserProfile["sigarette_giorno"]>, string][] =
   ["10_20", "da 10 a 20"], ["20_30", "da 20 a 30"],
   ["30_40", "da 30 a 40"], ["40_plus", "Più di 40"],
 ];
+const FUMA_DA_OPTS: [NonNullable<UserProfile["fuma_da"]>, string][] = [
+  ["meno_1", "Meno di 1 anno"],
+  ["1_5", "Da 1 a 5 anni"],
+  ["6_10", "Da 6 a 10 anni"],
+  ["11_20", "Da 11 a 20 anni"],
+  ["oltre_20", "Oltre 20 anni"],
+];
 
 function NumberWheel({ label, value, min, max, onChange }: { label: string; value: number; min: number; max: number; onChange: (v: number) => void }) {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -471,18 +478,19 @@ function StepFumo({ profile, update, ...c }: Common & { profile: Partial<UserPro
   const [sel, setSel] = useState<"si"|"no"|null>(profile.fumo === "si" ? "si" : profile.fumo === "no" || profile.fumo === "ex" ? "no" : null);
   const [past, setPast] = useState<"mai"|"smesso"|null>(profile.fumo === "ex" ? "smesso" : profile.fumo === "no" ? "mai" : null);
   const [sig, setSig] = useState<UserProfile["sigarette_giorno"] | undefined>(profile.sigarette_giorno);
+  const [fumaDa, setFumaDa] = useState<UserProfile["fuma_da"] | undefined>(profile.fuma_da);
   const [anni, setAnni] = useState<number>(profile.ex_smesso_anni ?? 2);
   const [mesi, setMesi] = useState<number>(profile.ex_smesso_mesi ?? 3);
 
   const canContinue =
-    (sel === "si" && !!sig) ||
+    (sel === "si" && !!sig && !!fumaDa) ||
     (sel === "no" && past === "mai") ||
     (sel === "no" && past === "smesso");
 
   const handleNext = () => {
-    if (sel === "si") update({ fumo: "si", sigarette_giorno: sig, ex_smesso_anni: undefined, ex_smesso_mesi: undefined });
-    else if (past === "mai") update({ fumo: "no", sigarette_giorno: undefined, ex_smesso_anni: undefined, ex_smesso_mesi: undefined });
-    else if (past === "smesso") update({ fumo: "ex", sigarette_giorno: undefined, ex_smesso_anni: anni, ex_smesso_mesi: mesi });
+    if (sel === "si") update({ fumo: "si", sigarette_giorno: sig, fuma_da: fumaDa, ex_smesso_anni: undefined, ex_smesso_mesi: undefined });
+    else if (past === "mai") update({ fumo: "no", sigarette_giorno: undefined, fuma_da: undefined, ex_smesso_anni: undefined, ex_smesso_mesi: undefined });
+    else if (past === "smesso") update({ fumo: "ex", sigarette_giorno: undefined, fuma_da: undefined, ex_smesso_anni: anni, ex_smesso_mesi: mesi });
     c.onContinue();
   };
 
@@ -496,6 +504,12 @@ function StepFumo({ profile, update, ...c }: Common & { profile: Partial<UserPro
 
       {sel === "si" && (
         <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid var(--line-100)", display: "flex", flexDirection: "column", gap: 12 }}>
+          <FieldLabel>Da quanto tempo fumi?</FieldLabel>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+            {FUMA_DA_OPTS.map(([k,l]) => (
+              <OptionButton key={k} compact selected={fumaDa === k} onClick={() => setFumaDa(k)}>{l}</OptionButton>
+            ))}
+          </div>
           <FieldLabel>Quante al giorno, più o meno?</FieldLabel>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             {SIGARETTE_OPTS.map(([k,l]) => (

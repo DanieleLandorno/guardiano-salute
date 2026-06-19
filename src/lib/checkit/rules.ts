@@ -22,6 +22,7 @@ export interface UserProfile {
   comorbidita?: string[];
   fumo?: "si" | "no" | "ex";
   sigarette_giorno?: "1_5" | "5_10" | "10_20" | "20_30" | "30_40" | "40_plus";
+  fuma_da?: "meno_1" | "1_5" | "6_10" | "11_20" | "oltre_20";
   ex_smesso_anni?: number;
   ex_smesso_mesi?: number;
   attivita_fisica?: "mai" | "raramente" | "qualche" | "spesso" | "ns";
