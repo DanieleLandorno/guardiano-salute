@@ -874,12 +874,12 @@ function StepPsa({ onSetScreening, state, ...c }: Common & { onSetScreening: (id
                     ? { label: "Nella norma", dot: "var(--teal-500)", bg: "var(--teal-050)", text: "var(--teal-700)" }
                     : val < 3
                     ? { label: "Da monitorare", dot: "var(--amber-500)", bg: "var(--amber-100)", text: "var(--cat-reminder-ink)" }
-                    : { label: "Da approfondire", dot: "#D4942A", bg: "#F5E6C8", text: "#8A6218" };
-                  const progress = ((val - 0) / 6) * 100;
+                    : { label: "Elevato", dot: "#E74C3C", bg: "#FBE9E7", text: "#C0392B" };
+                  const progress = ((val - 0) / 10) * 100;
                   return (
                     <>
                       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-                        <span style={{ fontFamily: "var(--font-display)", fontSize: 48, fontWeight: "var(--fw-display)" as any, color: "var(--teal-900)" }}>{val.toFixed(1)}</span>
+                        <span style={{ fontFamily: "var(--font-display)", fontSize: 48, fontWeight: "var(--fw-display)" as any, color: "var(--teal-900)" }}>{val >= 10 ? ">10" : val.toFixed(1)}</span>
                         {!unknown && (
                           <span style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "6px 12px", borderRadius: 999, background: psaBadge.bg, fontFamily: "var(--font-sans)", fontSize: 14, fontWeight: 700, color: psaBadge.text }}>
                             <span style={{ width: 10, height: 10, borderRadius: 999, background: psaBadge.dot }} />
@@ -887,12 +887,12 @@ function StepPsa({ onSetScreening, state, ...c }: Common & { onSetScreening: (id
                           </span>
                         )}
                       </div>
-                      <input type="range" min={0} max={6} step={0.1} value={val} className="psa-slider"
+                      <input type="range" min={0} max={10} step={0.1} value={val} className="psa-slider"
                         style={{ width: "100%", ["--psa-progress" as any]: `${progress}%` }}
                         onChange={(e) => { setVal(parseFloat(e.target.value)); setUnknown(false); }}
                       />
                       <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, fontFamily: "var(--font-sans)", fontSize: 13, fontWeight: 600, color: "var(--ink-400)" }}>
-                        <span>0</span><span>1</span><span>3</span><span>6</span>
+                        <span>0</span><span>1</span><span>3</span><span>&gt;10</span>
                       </div>
                       <p style={{ margin: "6px 0 0", fontFamily: "var(--font-sans)", fontSize: 13, color: "var(--ink-400)", textAlign: "center" }}>
                         Trascina il cursore per impostare il valore.
