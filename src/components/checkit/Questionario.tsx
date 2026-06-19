@@ -755,14 +755,14 @@ function StepPsa({ onSetScreening, state, ...c }: Common & { onSetScreening: (id
   const cadence = 2;
   const dateSet = month !== "" && year !== "";
   const valid = dateSet && (2026 - Number(year)) <= cadence;
-  const canContinue = sel === "no" || (sel === "si" && dateSet && (!valid || unknown || val >= 0));
+  const canContinue = sel === "no" || (sel === "si" && dateSet);
 
   const handleNext = () => {
     if (sel === "no") onSetScreening("prostata", { fatto: false, ultimo_test_data: null, ultimo_test_valore: null });
     else {
       const monthIdx = MONTHS.indexOf(month) + 1;
       const dataStr = year && monthIdx > 0 ? `${year}-${String(monthIdx).padStart(2, "0")}` : null;
-      onSetScreening("prostata", { fatto: true, ultimo_test_data: dataStr, ultimo_test_valore: unknown ? null : val });
+      onSetScreening("prostata", { fatto: true, ultimo_test_data: dataStr, ultimo_test_valore: !valid ? null : (unknown ? null : val) });
     }
     c.onContinue();
   };
@@ -785,6 +785,16 @@ function StepPsa({ onSetScreening, state, ...c }: Common & { onSetScreening: (id
               <SoftSelect placeholder="Anno" value={year} onChange={(e) => setYear(Number(e.target.value))}>{YEARS.map((y) => <option key={y} value={y}>{y}</option>)}</SoftSelect>
             </div>
           </div>
+          {dateSet && !valid && (
+            <div style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: 16, borderRadius: "var(--radius-md)", background: "var(--teal-050)", border: "1px solid var(--teal-100)" }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--teal-700)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 1 }}>
+                <circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" />
+              </svg>
+              <p style={{ margin: 0, fontFamily: "var(--font-sans)", fontSize: 14.5, lineHeight: 1.45, color: "var(--teal-900)" }}>
+                È passato il tempo consigliato dal tuo ultimo prelievo: ti aiuteremo a programmarne uno nuovo.
+              </p>
+            </div>
+          )}
           {dateSet && valid && (
             <div>
               <FieldLabel>Qual è stato il valore? (ng/mL)</FieldLabel>
