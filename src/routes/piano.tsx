@@ -86,7 +86,10 @@ function Inner() {
                 <Row key={s.id} name={`${s.nome}`} meta={`${profile.regione ?? ""} · ${s.meta ?? ""}`} action={s.azione} accent="#2C6E84"
                   badge={{ kind: "novita", label: "Su adesione" }} />
               ))}
-              {nazionali.length === 0 && regionali.length === 0 && <EmptyMsg>Nessun programma SSN attivo per il tuo profilo al momento.</EmptyMsg>}
+              {diagnosed.map((d) => (
+                <Row key={d.id} name={d.nome} note="Sei già seguito da uno specialista per questo — non rientra nello screening preventivo." accent="#2C6E84" />
+              ))}
+              {nazionali.length === 0 && regionali.length === 0 && diagnosed.length === 0 && <EmptyMsg>Nessun programma SSN attivo per il tuo profilo al momento.</EmptyMsg>}
             </Band>
 
             <Band accent="#5B4B86" eyebrow="Linee guida nazionali" title="Raccomandati per te">
