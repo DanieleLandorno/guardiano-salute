@@ -17,6 +17,7 @@ export interface UserProfile {
       ultimo_test_data?: string | null;      // YYYY-MM
       ultimo_test_esito?: "negativo" | "positivo" | "non_ricordo" | null;
       ultimo_test_valore?: number | null;
+      data_da_completare?: boolean;
     }
   >;
   comorbidita?: string[];
