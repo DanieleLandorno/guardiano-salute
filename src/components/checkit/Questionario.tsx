@@ -201,10 +201,9 @@ function StepSesso({ value, onSet, ...c }: Common & { value?: "F"|"M"; onSet: (v
 function StepDataNascita({ eta, onSet, ...c }: Common & { eta?: number; onSet: (eta: number) => void }) {
   // We capture day/month/year and store eta.
   const today = new Date();
-  const initialY = eta ? today.getFullYear() - eta : 1972;
-  const [d, setD] = useState("14");
-  const [m, setM] = useState("03");
-  const [y, setY] = useState(String(initialY));
+  const [d, setD] = useState("");
+  const [m, setM] = useState("");
+  const [y, setY] = useState("");
   const valid = !!d && !!m && y.length === 4 && Number(y) > 1900;
   const onNum = (set: (s: string) => void, max: number) => (e: React.ChangeEvent<HTMLInputElement>) =>
     set(e.target.value.replace(/[^0-9]/g, "").slice(0, max));
@@ -249,7 +248,7 @@ function StepDataNascita({ eta, onSet, ...c }: Common & { eta?: number; onSet: (
 }
 
 function StepRegione({ value, onSet, ...c }: Common & { value?: string; onSet: (v: string) => void }) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
   const sel = value ?? "Lombardia";
   const SOON = ["Piemonte", "Veneto"];
   return (
