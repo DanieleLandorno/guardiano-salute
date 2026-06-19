@@ -139,7 +139,7 @@ function EmptyMsg({ children }: { children: React.ReactNode }) {
   return <p style={{ margin: "16px 4px", fontFamily: "var(--font-sans)", fontSize: 14.5, color: "var(--ink-500)" }}>{children}</p>;
 }
 
-function Row({ name, meta, action, accent, badge }: { name: string; meta?: string; action?: string; accent: string; badge?: { kind: "free" | "novita"; label: string } }) {
+function Row({ name, meta, action, accent, badge, note }: { name: string; meta?: string; action?: string; accent: string; badge?: { kind: "free" | "novita"; label: string }; note?: string }) {
   const isDelegaMedico = action === "delega_medico" || action === "richiedi_colonscopia";
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 13, padding: "15px 4px", borderBottom: "1px solid var(--line-100)" }}>
@@ -148,6 +148,7 @@ function Row({ name, meta, action, accent, badge }: { name: string; meta?: strin
         {name}
         {meta && <span style={{ fontWeight: 600, color: "var(--ink-400)" }}> · {meta}</span>}
         {isDelegaMedico && <span style={{ display: "block", marginTop: 3, fontSize: 13, fontWeight: 600, color: "var(--amber-500)" }}>Da gestire con il tuo medico</span>}
+        {note && <span style={{ display: "block", marginTop: 3, fontSize: 13, fontWeight: 600, color: "var(--amber-500)" }}>{note}</span>}
       </span>
       {badge && (
         <span style={{
