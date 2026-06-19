@@ -89,13 +89,13 @@ export function Questionario() {
     case "peso_altezza": return <StepPesoAltezza {...common} h={profile.altezza_cm ?? 168} w={profile.peso_kg ?? 64} onSet={(h, w) => update({ altezza_cm: h, peso_kg: w })} />;
     case "attivita": return <StepAttivita {...common} value={profile.attivita_fisica} onSet={(v) => update({ attivita_fisica: v })} />;
     case "pelle_a": return <StepSingleChoice {...common} question="Come descriveresti la tua pelle?"
-      opts={[["chiara","Chiara (mi scotto facilmente al sole)"],["media","Media"],["scura","Scura (mi scotto raramente)"],["ns","Non so / Preferisco non rispondere"]]}
+      opts={[["chiara","Chiara","Mi scotto facilmente, mi abbronzo poco"],["media","Media","Mi scotto a volte, mi abbronzo gradualmente"],["scura","Scura","Mi scotto raramente, mi abbronzo facilmente"],["ns","Non so / Preferisco non rispondere"]]}
       value={profile.pelle} onSet={(v) => update({ pelle: v as any })} />;
     case "pelle_b": return <StepSingleChoice {...common} question="Hai molti nei sul corpo?"
-      opts={[["pochi","Pochi"],["diversi","Diversi"],["molti","Molti o non saprei"],["ns","Non so / Preferisco non rispondere"]]}
+      opts={[["pochi","Pochi"],["diversi","Diversi"],["molti","Molti"],["ns","Non so / Preferisco non rispondere"]]}
       value={profile.nei} onSet={(v) => update({ nei: v as any })} />;
     case "pelle_c": return <StepSingleChoice {...common} question="Quanto ti esponi al sole?"
-      opts={[["poco","Poco"],["moderato","Moderatamente"],["molto","Molto (sole intenso, lampade, lavoro all’aperto)"],["ns","Non so / Preferisco non rispondere"]]}
+      opts={[["poco","Raramente","Quasi sempre al chiuso"],["moderato","Qualche volta a settimana","Passeggiate, sport, attività all’aperto"],["molto","Quasi ogni giorno","Sole intenso, lampade, o lavoro all’aperto"],["ns","Non so / Preferisco non rispondere"]]}
       value={profile.sole} onSet={(v) => update({ sole: v as any })} />;
     case "hpv": return <StepHpv {...common} value={profile.vaccinazione_hpv} onSet={(v) => update({ vaccinazione_hpv: v })} />;
     case "cervicale": return <StepScreeningGenerico {...common}
@@ -399,11 +399,11 @@ const SIGARETTE_OPTS: [NonNullable<UserProfile["sigarette_giorno"]>, string][] =
   ["30_40", "da 30 a 40"], ["40_plus", "Più di 40"],
 ];
 const FUMA_DA_OPTS: [NonNullable<UserProfile["fuma_da"]>, string][] = [
-  ["meno_1", "Meno di 1 anno"],
-  ["1_5", "Da 1 a 5 anni"],
-  ["6_10", "Da 6 a 10 anni"],
-  ["11_20", "Da 11 a 20 anni"],
-  ["oltre_20", "Oltre 20 anni"],
+  ["meno_1", "Meno di 1"],
+  ["1_5", "Da 1 a 5"],
+  ["6_10", "Da 6 a 10"],
+  ["11_20", "Da 11 a 20"],
+  ["oltre_20", "Oltre 20"],
 ];
 
 function NumberWheel({ label, value, min, max, onChange }: { label: string; value: number; min: number; max: number; onChange: (v: number) => void }) {
@@ -504,7 +504,7 @@ function StepFumo({ profile, update, ...c }: Common & { profile: Partial<UserPro
 
       {sel === "si" && (
         <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid var(--line-100)", display: "flex", flexDirection: "column", gap: 12 }}>
-          <FieldLabel>Da quanto tempo fumi?</FieldLabel>
+          <FieldLabel>Da quanti anni fumi?</FieldLabel>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
             {FUMA_DA_OPTS.map(([k,l]) => (
               <OptionButton key={k} compact selected={fumaDa === k} onClick={() => setFumaDa(k)}>{l}</OptionButton>
@@ -585,11 +585,13 @@ function StepAttivita({ value, onSet, ...c }: Common & { value?: UserProfile["at
 
 function StepSingleChoice({
   question, opts, value, onSet, aboveTitle, cta, ctaVariant, ...c
-}: Common & { question: string; opts: [string, string][]; value?: string; onSet: (v: string) => void; aboveTitle?: ReactNode; cta?: string; ctaVariant?: "primary"|"soft" }) {
+}: Common & { question: string; opts: [string, string, string?][]; value?: string; onSet: (v: string) => void; aboveTitle?: ReactNode; cta?: string; ctaVariant?: "primary"|"soft" }) {
   return (
     <QuestionFrame {...c} question={question} canContinue={!!value} aboveTitle={aboveTitle} cta={cta} ctaVariant={ctaVariant}>
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        {opts.filter(([k]) => k !== "ns").map(([k,l]) => <OptionButton key={k} selected={value === k} onClick={() => onSet(k)}>{l}</OptionButton>)}
+        {opts.filter(([k]) => k !== "ns").map(([k,l,desc]) => (
+          <OptionButton key={k} selected={value === k} onClick={() => onSet(k)} sub={desc ? <span style={{ fontSize: 13, fontWeight: 400, color: "var(--ink-400)" }}>{desc}</span> : undefined}>{l}</OptionButton>
+        ))}
         {opts.some(([k]) => k === "ns") && <SkipButton selected={value === "ns"} onClick={() => onSet("ns")} />}
       </div>
     </QuestionFrame>
