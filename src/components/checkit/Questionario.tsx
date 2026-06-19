@@ -278,7 +278,7 @@ function StepDataNascita({ eta, onSet, ...c }: Common & { eta?: number; onSet: (
             value={d}
             onChange={onChangeDM(setD, mRef, d)}
             onFocus={() => setFocused("d")}
-            onBlur={onBlurPad(d, setD)}
+            onBlur={onBlurPad(setD)}
             placeholder="GG"
             style={boxStyle(false, "d", d)}
           />
@@ -289,7 +289,7 @@ function StepDataNascita({ eta, onSet, ...c }: Common & { eta?: number; onSet: (
             value={m}
             onChange={onChangeDM(setM, yRef, m)}
             onFocus={() => setFocused("m")}
-            onBlur={onBlurPad(m, setM)}
+            onBlur={onBlurPad(setM)}
             onKeyDown={onKeyBack(m, dRef)}
             placeholder="MM"
             style={boxStyle(false, "m", m)}
