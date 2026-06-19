@@ -214,7 +214,7 @@ function StepDataNascita({ eta, onSet, ...c }: Common & { eta?: number; onSet: (
 
   const onChangeDM = (
     set: (s: string) => void,
-    nextRef: React.RefObject<HTMLInputElement>,
+    nextRef: React.RefObject<HTMLInputElement | null>,
     current: string,
   ) => (e: React.ChangeEvent<HTMLInputElement>) => {
     const v = e.target.value.replace(/[^0-9]/g, "").slice(0, 2);
@@ -231,7 +231,7 @@ function StepDataNascita({ eta, onSet, ...c }: Common & { eta?: number; onSet: (
     if (val.length === 1) set(pad2(val));
   };
 
-  const onKeyBack = (val: string, prevRef: React.RefObject<HTMLInputElement>) =>
+  const onKeyBack = (val: string, prevRef: React.RefObject<HTMLInputElement | null>) =>
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === "Backspace" && val === "") {
         prevRef.current?.focus();
