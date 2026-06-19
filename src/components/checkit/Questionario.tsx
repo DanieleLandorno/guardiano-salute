@@ -755,14 +755,14 @@ function StepPsa({ onSetScreening, state, ...c }: Common & { onSetScreening: (id
   const cadence = 2;
   const dateSet = month !== "" && year !== "";
   const valid = dateSet && (2026 - Number(year)) <= cadence;
-  const canContinue = sel === "no" || (sel === "si" && dateSet && (!valid || unknown || val >= 0));
+  const canContinue = sel === "no" || (sel === "si" && dateSet);
 
   const handleNext = () => {
     if (sel === "no") onSetScreening("prostata", { fatto: false, ultimo_test_data: null, ultimo_test_valore: null });
     else {
       const monthIdx = MONTHS.indexOf(month) + 1;
       const dataStr = year && monthIdx > 0 ? `${year}-${String(monthIdx).padStart(2, "0")}` : null;
-      onSetScreening("prostata", { fatto: true, ultimo_test_data: dataStr, ultimo_test_valore: unknown ? null : val });
+      onSetScreening("prostata", { fatto: true, ultimo_test_data: dataStr, ultimo_test_valore: !valid ? null : (unknown ? null : val) });
     }
     c.onContinue();
   };
