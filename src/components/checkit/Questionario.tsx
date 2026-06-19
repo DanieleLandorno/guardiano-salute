@@ -226,9 +226,10 @@ function StepDataNascita({ eta, onSet, ...c }: Common & { eta?: number; onSet: (
   const onChangeY = (e: React.ChangeEvent<HTMLInputElement>) =>
     setY(e.target.value.replace(/[^0-9]/g, "").slice(0, 4));
 
-  const onBlurPad = (val: string, set: (s: string) => void) => () => {
+  const onBlurPad = (set: (s: string) => void) => (e: React.FocusEvent<HTMLInputElement>) => {
     setFocused(null);
-    if (val.length === 1) set(pad2(val));
+    const live = e.currentTarget.value;
+    if (live.length === 1) set(pad2(live));
   };
 
   const onKeyBack = (val: string, prevRef: React.RefObject<HTMLInputElement | null>) =>
