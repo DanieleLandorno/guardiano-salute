@@ -98,21 +98,21 @@ export function Questionario() {
       opts={[["poco","Raramente","Quasi sempre al chiuso"],["moderato","Qualche volta a settimana","Passeggiate, sport, attività all’aperto"],["molto","Quasi ogni giorno","Sole intenso, lampade, o lavoro all’aperto"],["ns","Non so / Preferisco non rispondere"]]}
       value={profile.sole} onSet={(v) => update({ sole: v as any })} />;
     case "hpv": return <StepHpv {...common} value={profile.vaccinazione_hpv} onSet={(v) => update({ vaccinazione_hpv: v })} />;
-    case "cervicale": return <StepScreeningGenerico {...common}
+    case "cervicale": return <StepScreeningGenerico key="cervice_uterina" {...common}
       screeningId="cervice_uterina"
       question="Hai mai fatto uno screening per la cervice uterina?"
       subtitle="Pap test o HPV-DNA test."
       withTipoOpts={[["pap_test","Pap test"],["hpv_dna","HPV-DNA test"],["ns","Non lo so"]]}
       defaultCadenceMonths={36}
       onSetScreening={setScreening} state={profile.screenings?.["cervice_uterina"] ?? {}} />;
-    case "mammografia": return <StepScreeningGenerico {...common}
+    case "mammografia": return <StepScreeningGenerico key="mammella" {...common}
       screeningId="mammella"
       question="Hai mai fatto una mammografia?"
       defaultCadenceMonths={24}
       onSetScreening={setScreening} state={profile.screenings?.["mammella"] ?? {}} />;
-    case "psa": return <StepPsa {...common}
+    case "psa": return <StepPsa key="prostata" {...common}
       onSetScreening={setScreening} state={profile.screenings?.["prostata"] ?? {}} />;
-    case "colon": return <StepScreeningGenerico {...common}
+    case "colon": return <StepScreeningGenerico key="colon_retto" {...common}
       screeningId="colon_retto"
       question="Hai mai fatto uno screening per il colon-retto?"
       subtitle="Test del sangue occulto fecale o colonscopia."
