@@ -358,14 +358,19 @@ function StepOncologica({ sesso, value, onSet, ...c }: Common & { sesso: "F"|"M"
 
 function StepFamOnco({ value, onSet, ...c }: Common & { value: string[]; onSet: (v: string[]) => void }) {
   const [sel, setSel] = useState<"si"|"no"|"ns"|null>(value.includes("ns") ? "ns" : value.length ? "si" : null);
-  const opts: [string,string][] = [["colon","Colon-retto"],["mammella","Mammella"],["ovaio","Ovaio"],["altro","Altro"]];
+  const opts: [string,string][] = [["colon","Colon-retto"],["mammella","Mammella"]];
   const toggle = (k: string) => onSet(value.includes(k) ? value.filter(x => x !== k) : [...value.filter(x => x !== "ns"), k]);
   const canContinue = sel === "no" || sel === "ns" || (sel === "si" && value.filter(v => v !== "ns").length > 0);
   return (
     <QuestionFrame {...c} question="Qualcuno nella tua famiglia ha ricevuto una diagnosi oncologica?" canContinue={canContinue}>
-      <p style={{ margin: "-18px 0 18px", fontFamily: "var(--font-sans)", fontSize: 15, lineHeight: 1.45, color: "var(--ink-500)" }}>
-        Considera i parenti più stretti: genitori, fratelli o sorelle, figli.
-      </p>
+      <div style={{
+        marginBottom: 26, padding: "16px 18px", borderRadius: "var(--radius-lg)",
+        background: "var(--teal-050)", border: "1px solid var(--teal-100)",
+      }}>
+        <p style={{ margin: 0, fontFamily: "var(--font-sans)", fontSize: 16, lineHeight: 1.5, color: "var(--teal-900)" }}>
+          Considera i parenti più stretti: genitori, fratelli o sorelle, figli.
+        </p>
+      </div>
       <div style={{ display: "flex", gap: 12 }}>
         <div style={{ flex: 1 }}><OptionButton compact selected={sel === "si"} onClick={() => { setSel("si"); onSet(value.filter(v => v !== "ns")); }}>Sì</OptionButton></div>
         <div style={{ flex: 1 }}><OptionButton compact selected={sel === "no"} onClick={() => { setSel("no"); onSet([]); }}>No</OptionButton></div>
@@ -385,7 +390,14 @@ function StepFamSingle({ caption, question, subtitle, value, onSet, ...c }: Comm
   const opts: [string,string][] = [["si","Sì"],["no","No"],["ns","Non so"]];
   return (
     <QuestionFrame {...c} question={question} canContinue={!!value}>
-      <p style={{ margin: "-18px 0 22px", fontFamily: "var(--font-sans)", fontSize: 15, lineHeight: 1.45, color: "var(--ink-500)" }}>{subtitle}</p>
+      <div style={{
+        marginBottom: 26, padding: "16px 18px", borderRadius: "var(--radius-lg)",
+        background: "var(--teal-050)", border: "1px solid var(--teal-100)",
+      }}>
+        <p style={{ margin: 0, fontFamily: "var(--font-sans)", fontSize: 16, lineHeight: 1.5, color: "var(--teal-900)" }}>
+          {subtitle}
+        </p>
+      </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         {opts.map(([k,l]) => <OptionButton key={k} selected={value === k} onClick={() => onSet(k as any)}>{l}</OptionButton>)}
       </div>
@@ -399,7 +411,6 @@ const SIGARETTE_OPTS: [NonNullable<UserProfile["sigarette_giorno"]>, string][] =
   ["30_40", "da 30 a 40"], ["40_plus", "Più di 40"],
 ];
 const FUMA_DA_OPTS: [NonNullable<UserProfile["fuma_da"]>, string][] = [
-  ["meno_1", "Meno di 1"],
   ["1_5", "Da 1 a 5"],
   ["6_10", "Da 6 a 10"],
   ["11_20", "Da 11 a 20"],
