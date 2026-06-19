@@ -585,11 +585,13 @@ function StepAttivita({ value, onSet, ...c }: Common & { value?: UserProfile["at
 
 function StepSingleChoice({
   question, opts, value, onSet, aboveTitle, cta, ctaVariant, ...c
-}: Common & { question: string; opts: [string, string][]; value?: string; onSet: (v: string) => void; aboveTitle?: ReactNode; cta?: string; ctaVariant?: "primary"|"soft" }) {
+}: Common & { question: string; opts: [string, string, string?][]; value?: string; onSet: (v: string) => void; aboveTitle?: ReactNode; cta?: string; ctaVariant?: "primary"|"soft" }) {
   return (
     <QuestionFrame {...c} question={question} canContinue={!!value} aboveTitle={aboveTitle} cta={cta} ctaVariant={ctaVariant}>
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        {opts.filter(([k]) => k !== "ns").map(([k,l]) => <OptionButton key={k} selected={value === k} onClick={() => onSet(k)}>{l}</OptionButton>)}
+        {opts.filter(([k]) => k !== "ns").map(([k,l,desc]) => (
+          <OptionButton key={k} selected={value === k} onClick={() => onSet(k)} sub={desc ? <span style={{ fontSize: 13, fontWeight: 400, color: "var(--ink-400)" }}>{desc}</span> : undefined}>{l}</OptionButton>
+        ))}
         {opts.some(([k]) => k === "ns") && <SkipButton selected={value === "ns"} onClick={() => onSet("ns")} />}
       </div>
     </QuestionFrame>
