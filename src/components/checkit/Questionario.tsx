@@ -204,9 +204,39 @@ function StepDataNascita({ eta, onSet, ...c }: Common & { eta?: number; onSet: (
   const [d, setD] = useState("");
   const [m, setM] = useState("");
   const [y, setY] = useState("");
+  const [focused, setFocused] = useState<"d" | "m" | "y" | null>(null);
+  const dRef = useRef<HTMLInputElement>(null);
+  const mRef = useRef<HTMLInputElement>(null);
+  const yRef = useRef<HTMLInputElement>(null);
   const valid = !!d && !!m && y.length === 4 && Number(y) > 1900;
-  const onNum = (set: (s: string) => void, max: number) => (e: React.ChangeEvent<HTMLInputElement>) =>
-    set(e.target.value.replace(/[^0-9]/g, "").slice(0, max));
+
+  const pad2 = (s: string) => (s.length === 1 ? "0" + s : s);
+
+  const onChangeDM = (
+    set: (s: string) => void,
+    nextRef: React.RefObject<HTMLInputElement>,
+    current: string,
+  ) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    const v = e.target.value.replace(/[^0-9]/g, "").slice(0, 2);
+    set(v);
+    if (v.length === 2 && current.length < 2) {
+      nextRef.current?.focus();
+    }
+  };
+  const onChangeY = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setY(e.target.value.replace(/[^0-9]/g, "").slice(0, 4));
+
+  const onBlurPad = (val: string, set: (s: string) => void) => () => {
+    setFocused(null);
+    if (val.length === 1) set(pad2(val));
+  };
+
+  const onKeyBack = (val: string, prevRef: React.RefObject<HTMLInputElement>) =>
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === "Backspace" && val === "") {
+        prevRef.current?.focus();
+      }
+    };
 
   const handleContinue = () => {
     const birth = new Date(Number(y), Number(m) - 1, Number(d));
@@ -217,25 +247,64 @@ function StepDataNascita({ eta, onSet, ...c }: Common & { eta?: number; onSet: (
     c.onContinue();
   };
 
-  const boxStyle = (wide?: boolean): React.CSSProperties => ({
-    width: wide ? 116 : 78, height: 78, textAlign: "center",
-    border: "1.5px solid var(--line-200)", borderRadius: "var(--radius-md)",
-    background: "var(--surface-card)", outline: "none",
-    fontFamily: "var(--font-display)", fontVariationSettings: "var(--font-display-settings)",
-    fontSize: 38, fontWeight: "var(--fw-display)" as any, color: "var(--teal-900)",
-  });
-  const Sep = () => <span style={{ width: 16, textAlign: "center", fontFamily: "var(--font-display)", fontSize: 30, color: "var(--ink-300)" }}>/</span>;
+  const boxStyle = (wide: boolean, name: "d" | "m" | "y", val: string): React.CSSProperties => {
+    const isFocused = focused === name;
+    const isFilled = wide ? val.length === 4 : val.length === 2;
+    const borderColor = isFocused
+      ? "var(--teal-500)"
+      : isFilled
+        ? "var(--ink-400)"
+        : "var(--line-200)";
+    return {
+      width: wide ? 116 : 78, height: 78, textAlign: "center",
+      border: `1.5px solid ${borderColor}`, borderRadius: "var(--radius-lg)",
+      background: isFocused ? "var(--teal-050)" : "var(--surface-card)", outline: "none",
+      fontFamily: "var(--font-display)", fontVariationSettings: "var(--font-display-settings)",
+      fontSize: 38, fontWeight: "var(--fw-display)" as any, color: "var(--teal-900)",
+      transition: "border-color 200ms ease, background-color 200ms ease",
+    };
+  };
+  const Sep = () => <span style={{ width: 16, textAlign: "center", fontFamily: "var(--font-display)", fontSize: 30, color: "var(--ink-200)" }}>/</span>;
   const Cap = ({ wide, children }: any) => <span style={{ width: wide ? 116 : 78, textAlign: "center", fontFamily: "var(--font-sans)", fontSize: 14, fontWeight: 600, color: "var(--ink-500)" }}>{children}</span>;
 
   return (
     <QuestionFrame {...c} onContinue={handleContinue} question="Qual è la tua data di nascita?" canContinue={valid}>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 12, marginTop: 14 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <input inputMode="numeric" value={d} onChange={onNum(setD, 2)} placeholder="GG" style={boxStyle()} />
+          <input
+            ref={dRef}
+            inputMode="numeric"
+            value={d}
+            onChange={onChangeDM(setD, mRef, d)}
+            onFocus={() => setFocused("d")}
+            onBlur={onBlurPad(d, setD)}
+            placeholder="GG"
+            style={boxStyle(false, "d", d)}
+          />
           <Sep />
-          <input inputMode="numeric" value={m} onChange={onNum(setM, 2)} placeholder="MM" style={boxStyle()} />
+          <input
+            ref={mRef}
+            inputMode="numeric"
+            value={m}
+            onChange={onChangeDM(setM, yRef, m)}
+            onFocus={() => setFocused("m")}
+            onBlur={onBlurPad(m, setM)}
+            onKeyDown={onKeyBack(m, dRef)}
+            placeholder="MM"
+            style={boxStyle(false, "m", m)}
+          />
           <Sep />
-          <input inputMode="numeric" value={y} onChange={onNum(setY, 4)} placeholder="AAAA" style={boxStyle(true)} />
+          <input
+            ref={yRef}
+            inputMode="numeric"
+            value={y}
+            onChange={onChangeY}
+            onFocus={() => setFocused("y")}
+            onBlur={() => setFocused(null)}
+            onKeyDown={onKeyBack(y, mRef)}
+            placeholder="AAAA"
+            style={boxStyle(true, "y", y)}
+          />
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <Cap>Giorno</Cap><span style={{ width: 16 }} />
