@@ -49,8 +49,10 @@ export function Questionario() {
     : undefined;
 
   const next = () => {
-    if (idx + 1 >= steps.length) navigate({ to: "/piano" });
-    else setIdx((i) => i + 1);
+    if (idx + 1 >= steps.length) {
+      try { sessionStorage.setItem("checkit-profile-v1", JSON.stringify(profile)); } catch {}
+      navigate({ to: "/piano" });
+    } else setIdx((i) => i + 1);
   };
   const back = () => {
     if (idx === 0) navigate({ to: "/come-funziona" });
