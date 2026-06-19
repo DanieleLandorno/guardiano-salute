@@ -601,7 +601,7 @@ function StepSingleChoice({
     <QuestionFrame {...c} question={question} canContinue={!!value} aboveTitle={aboveTitle} cta={cta} ctaVariant={ctaVariant}>
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         {opts.filter(([k]) => k !== "ns").map(([k,l,desc]) => (
-          <OptionButton key={k} selected={value === k} onClick={() => onSet(k)} sub={desc ? <span style={{ fontSize: 13, fontWeight: 400, color: "var(--ink-400)" }}>{desc}</span> : undefined}>{l}</OptionButton>
+          <OptionButton key={k} selected={value === k} onClick={() => onSet(k)} sub={desc ? <span style={{ display: "block", marginTop: 3, fontSize: 15, lineHeight: 1.4, fontWeight: 400, color: "var(--ink-600)" }}>{desc}</span> : undefined}>{l}</OptionButton>
         ))}
         {opts.some(([k]) => k === "ns") && <SkipButton selected={value === "ns"} onClick={() => onSet("ns")} />}
       </div>
