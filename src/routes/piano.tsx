@@ -27,6 +27,16 @@ function Inner() {
   const nazionali = plan.filter((p) => ["cervice_uterina", "mammella", "colon_retto"].includes(p.id));
   const regionali = plan.filter((p) => p.id === "prostata");
 
+  const organNames: Record<string, string> = {
+    cervice_uterina: "Screening della cervice uterina",
+    mammella: "Screening mammella",
+    prostata: "Screening prostata",
+    colon_retto: "Screening colon-retto",
+  };
+  const diagnosed = (profile.diagnosi_oncologica ?? [])
+    .filter((id) => id in organNames)
+    .map((id) => ({ id, nome: organNames[id] }));
+
   // Band 2: raccomandati — cardiovascolare/diabete in base alle risposte
   const racc: { nome: string; meta?: string }[] = [];
   if (profile.familiarita_cardio === "si" || (profile.comorbidita ?? []).includes("ipertensione") || (profile.comorbidita ?? []).includes("colesterolo")) {
