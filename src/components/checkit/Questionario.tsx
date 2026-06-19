@@ -226,9 +226,10 @@ function StepDataNascita({ eta, onSet, ...c }: Common & { eta?: number; onSet: (
   const onChangeY = (e: React.ChangeEvent<HTMLInputElement>) =>
     setY(e.target.value.replace(/[^0-9]/g, "").slice(0, 4));
 
-  const onBlurPad = (val: string, set: (s: string) => void) => () => {
+  const onBlurPad = (set: (s: string) => void) => (e: React.FocusEvent<HTMLInputElement>) => {
     setFocused(null);
-    if (val.length === 1) set(pad2(val));
+    const live = e.currentTarget.value;
+    if (live.length === 1) set(pad2(live));
   };
 
   const onKeyBack = (val: string, prevRef: React.RefObject<HTMLInputElement | null>) =>
@@ -277,7 +278,7 @@ function StepDataNascita({ eta, onSet, ...c }: Common & { eta?: number; onSet: (
             value={d}
             onChange={onChangeDM(setD, mRef, d)}
             onFocus={() => setFocused("d")}
-            onBlur={onBlurPad(d, setD)}
+            onBlur={onBlurPad(setD)}
             placeholder="GG"
             style={boxStyle(false, "d", d)}
           />
@@ -288,7 +289,7 @@ function StepDataNascita({ eta, onSet, ...c }: Common & { eta?: number; onSet: (
             value={m}
             onChange={onChangeDM(setM, yRef, m)}
             onFocus={() => setFocused("m")}
-            onBlur={onBlurPad(m, setM)}
+            onBlur={onBlurPad(setM)}
             onKeyDown={onKeyBack(m, dRef)}
             placeholder="MM"
             style={boxStyle(false, "m", m)}
