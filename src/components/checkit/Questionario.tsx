@@ -644,6 +644,7 @@ function StepScreeningGenerico({
   const [month, setMonth] = useState<string>(state.ultimo_test_data?.split("-")[1] ? MONTHS[Number(state.ultimo_test_data.split("-")[1]) - 1] : "");
   const [year, setYear] = useState<string | number>(state.ultimo_test_data?.split("-")[0] ?? "");
   const [esito, setEsito] = useState<"negativo"|"positivo"|"non_ricordo"|null>(state.ultimo_test_esito ?? null);
+  const [dataDaCompletare, setDataDaCompletare] = useState<boolean>(!!state.data_da_completare);
 
   const tipoCad = tipo === "pap_test" ? 36 : tipo === "hpv_dna" ? 60 : defaultCadenceMonths;
   const cadence = withTipoOpts ? Math.round(tipoCad / 12) : Math.round(defaultCadenceMonths / 12);
@@ -651,12 +652,14 @@ function StepScreeningGenerico({
   const valid = dateSet && (2026 - Number(year)) <= cadence;
   const showTipo = sel === "si" && !!withTipoOpts;
   const showDate = sel === "si" && (!withTipoOpts || !!tipo);
-  const showEsito = showDate && dateSet;
-  const canContinue = sel === "no" || (showDate && (!valid || !!esito));
+  const showEsito = showDate && dateSet && !dataDaCompletare;
+  const canContinue = sel === "no" || (showDate && (dataDaCompletare || (dateSet && (!valid || !!esito))));
 
   const handleNext = () => {
-    if (sel === "no") onSetScreening(screeningId, { fatto: false, ultimo_test_data: null, ultimo_test_esito: null, ultimo_test_tipo: null });
-    else {
+    if (sel === "no") onSetScreening(screeningId, { fatto: false, ultimo_test_data: null, ultimo_test_esito: null, ultimo_test_tipo: null, data_da_completare: false });
+    else if (dataDaCompletare) {
+      onSetScreening(screeningId, { fatto: true, ultimo_test_tipo: tipo, ultimo_test_data: null, ultimo_test_esito: null, data_da_completare: true });
+    } else {
       const monthIdx = MONTHS.indexOf(month) + 1;
       const dataStr = year && monthIdx > 0 ? `${year}-${String(monthIdx).padStart(2, "0")}` : null;
       onSetScreening(screeningId, {
@@ -664,6 +667,7 @@ function StepScreeningGenerico({
         ultimo_test_tipo: tipo,
         ultimo_test_data: dataStr,
         ultimo_test_esito: esito,
+        data_da_completare: false,
       });
     }
     c.onContinue();
@@ -703,11 +707,18 @@ function StepScreeningGenerico({
           )}
           {showDate && (
             <div>
-              <FieldLabel>Quando l'hai fatto?</FieldLabel>
-              <div style={{ display: "flex", gap: 10 }}>
+              <FieldLabel>Quando hai fatto l'<strong style={{ color: "var(--teal-700)", fontWeight: 800 }}>ULTIMO</strong> test?</FieldLabel>
+              <div style={{ display: "flex", gap: 10, opacity: dataDaCompletare ? 0.4 : 1, pointerEvents: dataDaCompletare ? "none" : "auto" }}>
                 <SoftSelect placeholder="Mese" value={month} onChange={(e) => setMonth(e.target.value)}>{MONTHS.map((m) => <option key={m} value={m}>{m}</option>)}</SoftSelect>
                 <SoftSelect placeholder="Anno" value={year} onChange={(e) => setYear(Number(e.target.value))}>{YEARS.map((y) => <option key={y} value={y}>{y}</option>)}</SoftSelect>
               </div>
+              <button type="button" onClick={() => setDataDaCompletare((v) => !v)} style={{
+                marginTop: 12, width: "100%", padding: 12, cursor: "pointer", borderRadius: "var(--radius-md)",
+                border: dataDaCompletare ? "1.5px solid var(--teal-500)" : "1.5px solid transparent",
+                background: dataDaCompletare ? "var(--teal-050)" : "transparent",
+                fontFamily: "var(--font-sans)", fontSize: 15, fontWeight: 600,
+                color: dataDaCompletare ? "var(--teal-700)" : "var(--ink-500)",
+              }}>Non ricordo la data, la inserisco più avanti</button>
             </div>
           )}
           {showEsito && (valid ? (
@@ -717,13 +728,6 @@ function StepScreeningGenerico({
                 <EsitoPill k="negativo" label="Negativo" dot="var(--teal-500)" />
                 <EsitoPill k="positivo" label="Positivo" dot="var(--amber-500)" />
               </div>
-              <button type="button" onClick={() => setEsito("non_ricordo")} style={{
-                marginTop: 12, width: "100%", padding: 12, cursor: "pointer", borderRadius: "var(--radius-md)",
-                border: esito === "non_ricordo" ? "1.5px solid var(--teal-500)" : "1.5px solid transparent",
-                background: esito === "non_ricordo" ? "var(--teal-050)" : "transparent",
-                fontFamily: "var(--font-sans)", fontSize: 15, fontWeight: 600,
-                color: esito === "non_ricordo" ? "var(--teal-700)" : "var(--ink-500)",
-              }}>Non lo ricordo</button>
             </div>
           ) : (
             <div style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "14px 16px", borderRadius: "var(--radius-md)", background: "var(--teal-050)", border: "1px solid var(--teal-100)" }}>
