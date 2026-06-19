@@ -32,7 +32,14 @@ export function Questionario() {
   }
   if (sesso === "M" && eta >= 50) sec5.push("psa");
   if (eta >= 50) sec5.push("colon");
-  const steps: StepKey[] = [...baseSteps, ...sec5];
+
+  const diagnosi = profile.diagnosi_oncologica ?? [];
+  const removeStep = new Set<StepKey>();
+  if (diagnosi.includes("cervice_uterina")) removeStep.add("cervicale");
+  if (diagnosi.includes("mammella")) removeStep.add("mammografia");
+  if (diagnosi.includes("prostata")) removeStep.add("psa");
+  if (diagnosi.includes("colon_retto")) removeStep.add("colon");
+  const steps: StepKey[] = [...baseSteps, ...sec5.filter((s) => !removeStep.has(s))];
 
   const [idx, setIdx] = useState(0);
   const cur = steps[Math.min(idx, steps.length - 1)];
