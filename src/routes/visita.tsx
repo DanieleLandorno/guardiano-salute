@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { createFileRoute, useNavigate, useSearch, Link } from "@tanstack/react-router";
 import { z } from "zod";
 import { PhoneFrame } from "@/components/checkit/PhoneFrame";
