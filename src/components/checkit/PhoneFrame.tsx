@@ -24,6 +24,7 @@ export function PhoneFrame({ children }: { children: ReactNode }) {
           boxShadow: "0 30px 70px rgba(4,52,44,0.18)",
           display: "flex",
           flexDirection: "column",
+          position: "relative",
         }}
       >
         <div
