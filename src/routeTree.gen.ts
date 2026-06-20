@@ -12,7 +12,6 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as VisitaRouteImport } from './routes/visita'
 import { Route as QuestionarioRouteImport } from './routes/questionario'
 import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as PianoRouteImport } from './routes/piano'
 import { Route as CompletatoRouteImport } from './routes/completato'
 import { Route as ComeFunzionaRouteImport } from './routes/come-funziona'
 import { Route as IndexRouteImport } from './routes/index'
@@ -31,11 +30,6 @@ const QuestionarioRoute = QuestionarioRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PianoRoute = PianoRouteImport.update({
-  id: '/piano',
-  path: '/piano',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CompletatoRoute = CompletatoRouteImport.update({
@@ -63,7 +57,6 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/come-funziona': typeof ComeFunzionaRoute
   '/completato': typeof CompletatoRoute
-  '/piano': typeof PianoRoute
   '/privacy': typeof PrivacyRoute
   '/questionario': typeof QuestionarioRoute
   '/visita': typeof VisitaRoute
@@ -73,7 +66,6 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/come-funziona': typeof ComeFunzionaRoute
   '/completato': typeof CompletatoRoute
-  '/piano': typeof PianoRoute
   '/privacy': typeof PrivacyRoute
   '/questionario': typeof QuestionarioRoute
   '/visita': typeof VisitaRoute
@@ -84,7 +76,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/come-funziona': typeof ComeFunzionaRoute
   '/completato': typeof CompletatoRoute
-  '/piano': typeof PianoRoute
   '/privacy': typeof PrivacyRoute
   '/questionario': typeof QuestionarioRoute
   '/visita': typeof VisitaRoute
@@ -96,7 +87,6 @@ export interface FileRouteTypes {
     | '/'
     | '/come-funziona'
     | '/completato'
-    | '/piano'
     | '/privacy'
     | '/questionario'
     | '/visita'
@@ -106,7 +96,6 @@ export interface FileRouteTypes {
     | '/'
     | '/come-funziona'
     | '/completato'
-    | '/piano'
     | '/privacy'
     | '/questionario'
     | '/visita'
@@ -116,7 +105,6 @@ export interface FileRouteTypes {
     | '/'
     | '/come-funziona'
     | '/completato'
-    | '/piano'
     | '/privacy'
     | '/questionario'
     | '/visita'
@@ -127,7 +115,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ComeFunzionaRoute: typeof ComeFunzionaRoute
   CompletatoRoute: typeof CompletatoRoute
-  PianoRoute: typeof PianoRoute
   PrivacyRoute: typeof PrivacyRoute
   QuestionarioRoute: typeof QuestionarioRoute
   VisitaRoute: typeof VisitaRoute
@@ -155,13 +142,6 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/piano': {
-      id: '/piano'
-      path: '/piano'
-      fullPath: '/piano'
-      preLoaderRoute: typeof PianoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/completato': {
@@ -199,7 +179,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ComeFunzionaRoute: ComeFunzionaRoute,
   CompletatoRoute: CompletatoRoute,
-  PianoRoute: PianoRoute,
   PrivacyRoute: PrivacyRoute,
   QuestionarioRoute: QuestionarioRoute,
   VisitaRoute: VisitaRoute,
