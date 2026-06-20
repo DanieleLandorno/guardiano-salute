@@ -102,16 +102,16 @@ function Inner() {
     } else {
       const v = add(payload);
       // scroll target hash via search not needed; piano scroll uses id
-      navigate({ to: "/piano", hash: `visita-${v.id}` });
+      navigate({ to: "/app/piano", hash: `visita-${v.id}` });
       return;
     }
-    navigate({ to: "/piano", hash: `visita-${editing!.id}` });
+    navigate({ to: "/app/piano", hash: `visita-${editing!.id}` });
   };
 
   const onDelete = () => {
     if (!editing) return;
     remove(editing.id);
-    navigate({ to: "/piano" });
+    navigate({ to: "/app/piano" });
   };
 
   return (
@@ -119,7 +119,7 @@ function Inner() {
       {/* Top bar with X */}
       <div style={{ display: "flex", alignItems: "center", padding: "2px 12px", flexShrink: 0 }}>
         <Link
-          to="/piano"
+          to="/app/piano"
           aria-label="Chiudi"
           style={{ width: 44, height: 44, display: "inline-flex", alignItems: "center", justifyContent: "center", color: "var(--teal-900)" }}
         >
