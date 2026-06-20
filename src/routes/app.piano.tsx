@@ -267,14 +267,13 @@ function ScreeningRow({ icon, iconBg, iconColor, title, meta, badge, callout, li
           {meta && (
             <div style={{ marginTop: 2, fontFamily: "var(--font-sans)", fontSize: 14, color: "var(--ink-500)" }}>{meta}</div>
           )}
+          {callout && (
+            <div style={{ marginTop: 8, padding: "10px 10px", background: "#FBF1DD", borderLeft: "3px solid #D4942A", borderRadius: 8, fontFamily: "var(--font-sans)", fontSize: 13, color: "#7A5310", lineHeight: 1.35 }}>
+              {callout}
+            </div>
+          )}
         </div>
       </div>
-
-      {callout && (
-        <div style={{ marginLeft: 44, padding: "10px 10px", background: "#FBF1DD", borderLeft: "3px solid #D4942A", borderRadius: 8, fontFamily: "var(--font-sans)", fontSize: 13, color: "#7A5310", lineHeight: 1.35 }}>
-          {callout}
-        </div>
-      )}
 
       {linked && linked.length > 0 && (
         <button
