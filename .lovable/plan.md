@@ -1,29 +1,19 @@
-## Diagnosi
+## Problema
+Il pulsante "Accetto il trattamento…" su `/privacy` non risponde perché il bundle client di TanStack Start non riesce a caricarsi:
 
-Ho verificato in locale (dev sandbox):
+```
+PAGEERROR: Failed to fetch dynamically imported module: virtual:tanstack-start-client-entry
+[vite] Pre-transform error: Failed to load url /src/routes/piano.tsx
+  in /dev-server/src/routeTree.gen.ts. Does the file exist?
+```
 
-- `src/routes/completato.tsx` esiste e `createFileRoute("/completato")` è corretto
-- È registrato in `src/routeTree.gen.ts` (riga 167-170)
-- `curl http://localhost:8080/completato` → **HTTP 200** con il contenuto "Tutto fatto!" renderizzato in SSR
-- Stesso esito per `/app/piano` → HTTP 200
+Nello scorso turno ho eliminato `src/routes/piano.tsx` e riscritto a mano `src/routeTree.gen.ts`, ma il plugin Vite di TanStack Router ha ri-iniettato il riferimento alla vecchia route, e Vite continua a richiedere il file inesistente. Risultato: React non idrata, nessun handler `onClick` viene agganciato → tutti i bottoni risultano "morti", non solo il consenso.
 
-**Quindi in preview/dev la rotta funziona.** Il 404 che vedi proviene dal sito **pubblicato** (`check-my-health-guide.lovable.app`), che è ancora la build precedente: in quella build la rotta `/completato` non esisteva ancora, quindi torna 404.
+## Fix
+1. Riavviare il dev server Vite per forzare il plugin di TanStack Router a rigenerare `src/routeTree.gen.ts` dai file effettivamente presenti in `src/routes/` (senza `piano.tsx`).
+2. Verificare che `routeTree.gen.ts` non contenga più import di `./routes/piano`.
+3. Riaprire `/privacy` con Playwright, cliccare "Accetto il trattamento…", confermare che il bottone "Continua" diventa abilitato (stato `c1` aggiornato → idratazione OK).
+4. Smoke test del flusso completo già richiesto: `/privacy` → `/come-funziona` → `/questionario` → `/completato` → `/app/piano` (200 + interazioni).
 
-Le modifiche al frontend (nuove rotte, componenti, stili) **non vanno live in automatico**: serve un republish dalla dialog Publish.
-
-## Piano
-
-Nessuna modifica al codice. Due passi, in ordine:
-
-1. **Hard refresh della preview** (Cmd/Ctrl+Shift+R) per scaricare lo stato corrente del dev server e scartare eventuali bundle vecchi in cache. Verifica che il flusso `questionario → /completato → /piano → "Aggiungi al mio piano" → /app/piano` funzioni end-to-end nella preview.
-
-2. **Republish** dal pulsante Publish (in alto a destra) → "Update". Dopo l'update, `check-my-health-guide.lovable.app/completato` smetterà di dare 404.
-
-## Se dopo il republish il 404 persiste
-
-Allora il problema non è la pubblicazione ma un errore di hydration runtime (i log console mostrano un warning `AwaitInner` e `Expected to find a match below the root match in SPA mode`). In quel caso indagherei:
-
-- se `ProfileProvider` o `useProfile` lanciano qualcosa in SSR
-- se la build di produzione perde la registrazione di `/completato` (controllo `dist/.../routeTree`)
-
-Ma prima conviene fare republish — è la causa molto più probabile dato che in dev tutto risponde 200.
+## Nessuna modifica di codice applicativo
+Il codice di `privacy.tsx`, `Consent`, `PhoneFrame` è corretto: il problema è puramente uno stato sporco del dev server dopo la cancellazione del file. Non tocco UI, store, né altre route.
