@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { PhoneFrame } from "@/components/checkit/PhoneFrame";
 import { ProfileProvider, useProfile } from "@/lib/checkit/store";
 import { VisitsProvider, useVisits, formatDateIT, visitStatus, freqLabel, TIPOLOGIE, type Visit } from "@/lib/checkit/visits";
@@ -25,7 +25,7 @@ function PianoRoute() {
 function Inner() {
   const { profile } = useProfile();
   const { visits } = useVisits();
-  const router = useRouter();
+  
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
   const ready = !!profile.sesso && !!profile.eta;
