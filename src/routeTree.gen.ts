@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as VisitaRouteImport } from './routes/visita'
 import { Route as QuestionarioRouteImport } from './routes/questionario'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PianoRouteImport } from './routes/piano'
@@ -16,6 +17,11 @@ import { Route as CompletatoRouteImport } from './routes/completato'
 import { Route as ComeFunzionaRouteImport } from './routes/come-funziona'
 import { Route as IndexRouteImport } from './routes/index'
 
+const VisitaRoute = VisitaRouteImport.update({
+  id: '/visita',
+  path: '/visita',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const QuestionarioRoute = QuestionarioRouteImport.update({
   id: '/questionario',
   path: '/questionario',
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/piano': typeof PianoRoute
   '/privacy': typeof PrivacyRoute
   '/questionario': typeof QuestionarioRoute
+  '/visita': typeof VisitaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/piano': typeof PianoRoute
   '/privacy': typeof PrivacyRoute
   '/questionario': typeof QuestionarioRoute
+  '/visita': typeof VisitaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,6 +79,7 @@ export interface FileRoutesById {
   '/piano': typeof PianoRoute
   '/privacy': typeof PrivacyRoute
   '/questionario': typeof QuestionarioRoute
+  '/visita': typeof VisitaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -81,6 +90,7 @@ export interface FileRouteTypes {
     | '/piano'
     | '/privacy'
     | '/questionario'
+    | '/visita'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -89,6 +99,7 @@ export interface FileRouteTypes {
     | '/piano'
     | '/privacy'
     | '/questionario'
+    | '/visita'
   id:
     | '__root__'
     | '/'
@@ -97,6 +108,7 @@ export interface FileRouteTypes {
     | '/piano'
     | '/privacy'
     | '/questionario'
+    | '/visita'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -106,10 +118,18 @@ export interface RootRouteChildren {
   PianoRoute: typeof PianoRoute
   PrivacyRoute: typeof PrivacyRoute
   QuestionarioRoute: typeof QuestionarioRoute
+  VisitaRoute: typeof VisitaRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/visita': {
+      id: '/visita'
+      path: '/visita'
+      fullPath: '/visita'
+      preLoaderRoute: typeof VisitaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/questionario': {
       id: '/questionario'
       path: '/questionario'
@@ -162,6 +182,7 @@ const rootRouteChildren: RootRouteChildren = {
   PianoRoute: PianoRoute,
   PrivacyRoute: PrivacyRoute,
   QuestionarioRoute: QuestionarioRoute,
+  VisitaRoute: VisitaRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
