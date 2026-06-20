@@ -1,58 +1,29 @@
-## Diagnosi del 404
+## Diagnosi
 
-La route `/completato` esiste e funziona nel preview live (la stai vedendo ora). Il 404 probabilmente compare nel sito **pubblicato**, che non include ancora `/completato` (aggiunta dopo l'ultimo publish). Nessuna correzione di codice necessaria — basta ripubblicare alla fine del lavoro. Sistemiamo intanto il flow completo che oggi finisce nel vuoto dopo "Vedi il mio piano".
+Ho verificato in locale (dev sandbox):
 
-## Flow finale (3 step)
+- `src/routes/completato.tsx` esiste e `createFileRoute("/completato")` è corretto
+- È registrato in `src/routeTree.gen.ts` (riga 167-170)
+- `curl http://localhost:8080/completato` → **HTTP 200** con il contenuto "Tutto fatto!" renderizzato in SSR
+- Stesso esito per `/app/piano` → HTTP 200
 
-```text
-questionario → /completato → /piano (anteprima)
-   "Vedi il mio piano"        "Aggiungi al mio piano"
-                                       ↓
-                                  /app/piano  ← schermata in-app
-                                  (bottom nav, FAB, Le tue visite)
-```
+**Quindi in preview/dev la rotta funziona.** Il 404 che vedi proviene dal sito **pubblicato** (`check-my-health-guide.lovable.app`), che è ancora la build precedente: in quella build la rotta `/completato` non esisteva ancora, quindi torna 404.
 
-## Cosa cambia
+Le modifiche al frontend (nuove rotte, componenti, stili) **non vanno live in automatico**: serve un republish dalla dialog Publish.
 
-### 1) `/piano` — diventa esplicitamente "anteprima del piano"
+## Piano
 
-- Resta il layout attuale (Programmi SSN, Raccomandati, Buone pratiche).
-- CTA in basso rinominato **"Aggiungi alla mia lista" → "Aggiungi al mio piano"**, navigazione a `/app/piano`.
-- Rimosso da qui: FAB "+", sezione "Le tue visite", link "Hai una visita collegata". Questi appartengono solo all'in-app.
+Nessuna modifica al codice. Due passi, in ordine:
 
-### 2) Nuova route `/app/piano` — la schermata in-app (image #1)
+1. **Hard refresh della preview** (Cmd/Ctrl+Shift+R) per scaricare lo stato corrente del dev server e scartare eventuali bundle vecchi in cache. Verifica che il flusso `questionario → /completato → /piano → "Aggiungi al mio piano" → /app/piano` funzioni end-to-end nella preview.
 
-Layout dall'alto:
-- Header: eyebrow teal **PREVENZIONE**, H1 display **Il tuo piano**, sottotitolo "In base alle linee guida ministeriali e regionali".
-- Chip teal chiaro **"{N} controlli nel tuo piano"** (N = numero item dal `computePlan`).
-- Card bianca **PROGRAMMI DEL SSN** con riga per screening (icona circolare teal chiaro, nome bold, meta `Regione · Ogni X anni`, badge "Su adesione" dove pertinente, callout giallo "Sei già seguito da uno specialista…" per le diagnosi). Sotto, link teal **🔗 Hai una visita collegata · Vedi sotto** quando esiste una visita collegata, che scrolla alla card corrispondente.
-- Card bianca **LINEE GUIDA NAZIONALI** (Cardiovascolare, Diabete) con icone circolari.
-- Card bianca **BUONE PRATICHE** (Dermatologia, Oculistica, Medico di base).
-- Sezione **LE TUE VISITE** su fondo `--teal-100` con le card delle visite utente (riusa `LeTueVisite` + `VisitCard` esistenti).
-- **FAB +** teal fisso in basso a destra, sopra la bottom nav, che apre `/visita`.
-- **Bottom nav** sticky (Home / Piano attivo / Prenotazioni / Referti) come tab bar in `<PhoneFrame>`. Per ora solo "Piano" è funzionale; le altre tab sono stub interni (no route, mostrano un toast "In arrivo" o non fanno nulla) per non generare altri 404.
+2. **Republish** dal pulsante Publish (in alto a destra) → "Update". Dopo l'update, `check-my-health-guide.lovable.app/completato` smetterà di dare 404.
 
-Wrap: `ProfileProvider` + `VisitsProvider` + `PhoneFrame`.
+## Se dopo il republish il 404 persiste
 
-### 3) `/visita` — invariata, ma "torna a" cambia
+Allora il problema non è la pubblicazione ma un errore di hydration runtime (i log console mostrano un warning `AwaitInner` e `Expected to find a match below the root match in SPA mode`). In quel caso indagherei:
 
-- Il pulsante X e i `navigate` dopo save/cancella puntano a `/app/piano` invece che a `/piano`.
+- se `ProfileProvider` o `useProfile` lanciano qualcosa in SSR
+- se la build di produzione perde la registrazione di `/completato` (controllo `dist/.../routeTree`)
 
-### 4) Ripubblicare
-
-A fine intervento, ripubblicare il sito così il 404 scompare anche sul dominio published.
-
-## Dettagli tecnici
-
-- File nuovo: `src/routes/app.piano.tsx` (con `createFileRoute('/app/piano')`). Il file genera anche `src/routeTree.gen.ts` automaticamente.
-- Riuso dei componenti già scritti: `LeTueVisite`, `VisitCard`, helper `computePlan`, store `VisitsProvider`/`useVisits`.
-- Bottom nav: componente locale `BottomNav` con 4 voci e icone Lucide (`Home`, `ClipboardCheck`, `Calendar`, `FileText`). Solo "Piano" attiva (teal-700); le altre disabilitate visivamente (ink-400).
-- FAB: `position: absolute; right: 20px; bottom: 84px` dentro `PhoneFrame` (che è già `position: relative`).
-- Scroll container con `padding-bottom` extra per non nascondere l'ultima card sotto FAB + nav.
-- Conteggio chip: `plan.length + diagnosed.length` (i controlli mostrati nel piano).
-- Nessuna modifica a `rules.ts` né alla logica di `computePlan`.
-
-## Fuori scope
-
-- Redesign dei campi `/visita` in stile "card per sezione" (image #2) — da fare in un secondo intervento.
-- Pagine reali per Home / Prenotazioni / Referti.
+Ma prima conviene fare republish — è la causa molto più probabile dato che in dev tutto risponde 200.
