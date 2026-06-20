@@ -271,7 +271,7 @@ function ScreeningRow({ icon, iconBg, iconColor, title, meta, badge, callout, li
       </div>
 
       {callout && (
-        <div style={{ marginLeft: 50, padding: "10px 12px", background: "#FBF1DD", borderLeft: "3px solid #D4942A", borderRadius: 8, fontFamily: "var(--font-sans)", fontSize: 13.5, color: "#7A5310", lineHeight: 1.4 }}>
+        <div style={{ marginLeft: 44, padding: "10px 10px", background: "#FBF1DD", borderLeft: "3px solid #D4942A", borderRadius: 8, fontFamily: "var(--font-sans)", fontSize: 13, color: "#7A5310", lineHeight: 1.35 }}>
           {callout}
         </div>
       )}
