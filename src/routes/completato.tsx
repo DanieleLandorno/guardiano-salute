@@ -93,7 +93,7 @@ function Inner() {
       <div style={{ flexShrink: 0, padding: "13px 18px 22px" }}>
         <button
           type="button"
-          onClick={() => navigate({ to: "/piano" })}
+          onClick={() => navigate({ to: "/app/piano" })}
           style={{
             width: "100%",
             padding: "16px 22px",
