@@ -391,23 +391,17 @@ function ScreeningRow({
         <span style={{ flexShrink: 0, width: 38, height: 38, borderRadius: "50%", background: iconBg, color: iconColor, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>{icon}</span>
 
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontFamily: "var(--font-sans)", fontSize: 17, fontWeight: 700, color: "var(--teal-900)", letterSpacing: "-0.01em", lineHeight: 1.25, overflowWrap: "anywhere" }}>
+          <div style={{ fontFamily: "var(--font-sans)", fontSize: 15, fontWeight: 600, color: "#04342C", letterSpacing: "-0.01em", lineHeight: 1.25, overflowWrap: "anywhere" }}>
             {title}
           </div>
-          {badge && (
-            <div style={{ marginTop: 6 }}>
-              <span style={{
-                display: "inline-flex", alignItems: "center", gap: 5,
-                fontFamily: "var(--font-sans)", fontSize: 12.5, fontWeight: 700, padding: "4px 10px", borderRadius: 999, whiteSpace: "nowrap",
-                background: badge.kind === "free" ? "var(--teal-100)" : "#FBF1DD",
-                color: badge.kind === "free" ? "var(--teal-700)" : "#97681A",
-              }}>
-                {badge.label}
-              </span>
+          {(badge || meta) && (
+            <div style={{ marginTop: 4, fontFamily: "var(--font-sans)", fontSize: 11.5, color: "#888780", lineHeight: 1.35 }}>
+              {badge && (
+                <span style={{ color: "#0F6E56", fontWeight: 600 }}>{badge.label}</span>
+              )}
+              {badge && meta ? " · " : ""}
+              {meta}
             </div>
-          )}
-          {meta && (
-            <div style={{ marginTop: 4, fontFamily: "var(--font-sans)", fontSize: 14, color: "var(--ink-500)" }}>{meta}</div>
           )}
 
           {diagnosisBadge && <DiagnosisToggle />}
