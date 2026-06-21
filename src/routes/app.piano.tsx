@@ -422,13 +422,13 @@ function ScreeningRow({
 
       {/* Linked visits (inline "AGGIUNTE DA TE") */}
       {linkedVisits.length > 0 && (
-        <div style={{ marginTop: 10, marginLeft: 50, borderLeft: "3px solid var(--teal-500)", paddingLeft: 12 }}>
-          <div style={{ fontFamily: "var(--font-sans)", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--teal-700)", marginBottom: 6 }}>
+        <div style={{ marginTop: 6, marginLeft: 50, borderLeft: "3px solid var(--teal-500)", paddingLeft: 12 }}>
+          <div style={{ fontFamily: "var(--font-sans)", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--teal-700)", marginBottom: 4 }}>
             AGGIUNTE DA TE:
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {linkedVisits.map((v) => (
-              <div key={v.id} data-visita-id={v.id} style={{ padding: "8px 2px" }}>
+              <div key={v.id} data-visita-id={v.id} style={{ padding: "4px 2px" }}>
                 <VisitInlineRow v={v} />
               </div>
             ))}
