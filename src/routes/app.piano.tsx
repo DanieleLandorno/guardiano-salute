@@ -123,7 +123,7 @@ function Inner() {
   }, {});
 
   const standaloneVisits = visits.filter((v) => !v.screening_id);
-  const totaleControlli = plan.length + diagnosed.length + racc.length + buone.length;
+  const totaleControlli = plan.length + diagnosedExtra + racc.length + buone.length;
 
   const scrollToVisit = (id: string) => {
     const el = scrollRef.current?.querySelector(`[data-visita-id="${id}"]`) as HTMLElement | null;
