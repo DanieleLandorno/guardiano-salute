@@ -232,6 +232,11 @@ function Inner() {
                   {planGroups.ssn.map((p) => <option key={p.id} value={p.id}>{p.nome}</option>)}
                 </optgroup>
               )}
+              {planGroups.diagnosed.length > 0 && (
+                <optgroup label="Sei seguito da uno specialista">
+                  {planGroups.diagnosed.map((p) => <option key={p.id} value={p.id}>{p.nome}</option>)}
+                </optgroup>
+              )}
               {planGroups.racc.length > 0 && (
                 <optgroup label="Linee guida nazionali">
                   {planGroups.racc.map((p) => <option key={p.id} value={p.id}>{p.nome}</option>)}
@@ -240,11 +245,6 @@ function Inner() {
               {planGroups.buone.length > 0 && (
                 <optgroup label="Buone pratiche">
                   {planGroups.buone.map((p) => <option key={p.id} value={p.id}>{p.nome}</option>)}
-                </optgroup>
-              )}
-              {planGroups.diagnosed.length > 0 && (
-                <optgroup label="Sei seguito da uno specialista">
-                  {planGroups.diagnosed.map((p) => <option key={p.id} value={p.id}>{p.nome}</option>)}
                 </optgroup>
               )}
               {!hasAnyScreening && <option value="" disabled>Nessuno screening disponibile</option>}
