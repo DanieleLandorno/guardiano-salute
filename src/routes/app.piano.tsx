@@ -585,7 +585,7 @@ function VisitInlineRow({ v }: { v: Visit }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontFamily: "var(--font-sans)", fontSize: 16, fontWeight: 700, color: "var(--teal-900)", lineHeight: 1.25, letterSpacing: "-0.01em" }}>
+        <div style={{ fontFamily: "var(--font-sans)", fontSize: 15, fontWeight: 700, color: "var(--teal-900)", lineHeight: 1.25, letterSpacing: "-0.01em" }}>
           {v.nome}
         </div>
         <div style={{ marginTop: 2, fontFamily: "var(--font-sans)", fontSize: 13.5, color: "var(--ink-500)" }}>
