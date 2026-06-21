@@ -411,8 +411,7 @@ function ScreeningRow({
           )}
         </div>
 
-        {/* Reserved columns */}
-        <EditSlot />
+        {/* Reserved column */}
         <PillSlot>{dueDate && <DuePill date={dueDate} />}</PillSlot>
       </div>
 
