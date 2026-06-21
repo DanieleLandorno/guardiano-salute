@@ -66,14 +66,11 @@ function Inner() {
   const prenotato = !!(screenState as { prenotato?: boolean }).prenotato;
   const screeningDaPrenotare = !!next && !prenotato;
 
-  // Date pill (mese/anno) when we have ultimo_test_data + cadenza
-  let mese: string | null = null;
-  let anno: string | null = null;
+  // Extended month/year (lowercase) for the next screening subtitle
+  let dataEstesa: string | null = null;
   if (next?.cadenza_mesi && screenState.ultimo_test_data && !screenState.data_da_completare) {
     const d = nextDateFromYearMonth(screenState.ultimo_test_data, next.cadenza_mesi);
-    const lbl = pillLabels(d);
-    mese = lbl.mese;
-    anno = lbl.anno;
+    dataEstesa = d.toLocaleDateString("it-IT", { month: "long", year: "numeric" });
   }
 
   return (
