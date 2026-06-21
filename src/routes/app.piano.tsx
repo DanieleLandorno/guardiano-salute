@@ -656,7 +656,7 @@ function BottomNav() {
         gap: 4,
       }}
     >
-      <NavTab icon={<HomeIcon size={22} strokeWidth={1.9} />} label="Home" />
+      <NavTab icon={<HomeIcon size={22} strokeWidth={1.9} />} label="Home" to="/app/home" />
       <NavTab icon={<ClipboardCheck size={22} strokeWidth={2.2} />} label="Piano" active />
       <NavTab icon={<CalendarIcon size={22} strokeWidth={1.9} />} label="Prenotazioni" />
       <NavTab icon={<FileText size={22} strokeWidth={1.9} />} label="Referti" />
@@ -664,30 +664,41 @@ function BottomNav() {
   );
 }
 
-function NavTab({ icon, label, active }: { icon: React.ReactNode; label: string; active?: boolean }) {
+function NavTab({ icon, label, active, to }: { icon: React.ReactNode; label: string; active?: boolean; to?: string }) {
   const color = active ? "var(--teal-700)" : "var(--ink-400)";
+  const style: React.CSSProperties = {
+    background: "transparent",
+    border: "none",
+    padding: "6px 4px",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 4,
+    color,
+    cursor: active ? "default" : "pointer",
+    fontFamily: "var(--font-sans)",
+    fontSize: 11.5,
+    fontWeight: active ? 700 : 600,
+    textDecoration: "none",
+  };
+  if (to && !active) {
+    return (
+      <Link to={to} style={style} aria-label={label}>
+        {icon}
+        <span>{label}</span>
+      </Link>
+    );
+  }
   return (
     <button
       type="button"
       aria-current={active ? "page" : undefined}
       aria-label={label}
-      style={{
-        background: "transparent",
-        border: "none",
-        padding: "6px 4px",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        gap: 4,
-        color,
-        cursor: active ? "default" : "pointer",
-        fontFamily: "var(--font-sans)",
-        fontSize: 11.5,
-        fontWeight: active ? 700 : 600,
-      }}
+      style={style}
     >
       {icon}
       <span>{label}</span>
     </button>
   );
 }
+
