@@ -451,13 +451,12 @@ function ScreeningRow({
 // Diagnosis badge (toggle)
 // ---------------------------------------------------------------------------
 
-function DiagnosisToggle() {
-  const [open, setOpen] = useState(false);
+function DiagnosisToggleButton({ open, onToggle }: { open: boolean; onToggle: () => void }) {
   return (
     <div style={{ marginTop: 8 }}>
       <button
         type="button"
-        onClick={() => setOpen((o) => !o)}
+        onClick={onToggle}
         aria-expanded={open}
         style={{
           display: "inline-flex",
@@ -485,11 +484,6 @@ function DiagnosisToggle() {
           style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform 180ms", flexShrink: 0 }}
         />
       </button>
-      {open && (
-        <div style={{ marginTop: 8, padding: "10px 10px", background: "#FBF1DD", borderLeft: "3px solid #D9A93E", borderRadius: 8, fontFamily: "var(--font-sans)", fontSize: 13, color: "#7A5310", lineHeight: 1.4 }}>
-          Avendo una diagnosi in corso, non rientri nello screening preventivo: il percorso lo definisce il tuo specialista.
-        </div>
-      )}
     </div>
   );
 }
