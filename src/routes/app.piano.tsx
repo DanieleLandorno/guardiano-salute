@@ -181,16 +181,27 @@ function Inner() {
             <Card eyebrow="Programmi del SSN" subtitle="Previsti dal Servizio Sanitario Nazionale">
               {ssnAll.map((s) => (
                 <ScreeningRow
-                  key={s.id}
+                  key={s.key}
                   icon={screeningIcon[s.id] ?? <Shield size={20} strokeWidth={2.2} />}
                   iconBg="var(--teal-100)"
                   iconColor="var(--teal-700)"
                   title={s.nome}
-                  meta={[s.regione, s.meta].filter(Boolean).join(" · ")}
-                  badge={s.id === "prostata" ? { label: "Su adesione", kind: "novita" } : { label: "Gratuito", kind: "free" }}
-                  screening={s}
-                  profile={profile as UserProfile}
-                  onSetUltimoTest={(yyyymm) => setScreening(s.id, { ultimo_test_data: yyyymm })}
+                  meta={s.screening ? [s.screening.regione, s.screening.meta].filter(Boolean).join(" · ") : undefined}
+                  badge={
+                    !s.isDiagnosed && s.screening
+                      ? s.id === "prostata"
+                        ? { label: "Su adesione", kind: "novita" }
+                        : { label: "Gratuito", kind: "free" }
+                      : undefined
+                  }
+                  screening={!s.isDiagnosed ? s.screening : undefined}
+                  profile={!s.isDiagnosed ? (profile as UserProfile) : undefined}
+                  onSetUltimoTest={
+                    !s.isDiagnosed && s.screening
+                      ? (yyyymm) => setScreening(s.id, { ultimo_test_data: yyyymm })
+                      : undefined
+                  }
+                  diagnosisBadge={s.isDiagnosed}
                   linkedVisits={visitsByScreening[s.id] ?? []}
                 />
               ))}
@@ -200,22 +211,6 @@ function Inner() {
                 </div>
               )}
             </Card>
-
-            {diagnosed.length > 0 && (
-              <Card eyebrow="Sei seguito da uno specialista" subtitle="Screening con diagnosi in corso — il percorso lo definisce il tuo specialista">
-                {diagnosed.map((d) => (
-                  <ScreeningRow
-                    key={d.id}
-                    icon={screeningIcon[d.id] ?? <Shield size={20} strokeWidth={2.2} />}
-                    iconBg="var(--teal-100)"
-                    iconColor="var(--teal-700)"
-                    title={d.nome}
-                    diagnosisBadge
-                    linkedVisits={visitsByScreening[d.id] ?? []}
-                  />
-                ))}
-              </Card>
-            )}
 
             <Card eyebrow="Linee guida nazionali" subtitle="Raccomandati — parlane col tuo medico">
               {racc.map((r) => (
