@@ -4,7 +4,7 @@ import { PhoneFrame } from "@/components/checkit/PhoneFrame";
 import { ProfileProvider, useProfile } from "@/lib/checkit/store";
 import { VisitsProvider } from "@/lib/checkit/visits";
 import { computePlan, type UserProfile } from "@/lib/checkit/rules";
-import { nextDateFromYearMonth, pillLabels } from "@/lib/checkit/schedule";
+import { nextDateFromYearMonth } from "@/lib/checkit/schedule";
 import { Progress } from "@/components/ui/progress";
 import {
   Clock,
