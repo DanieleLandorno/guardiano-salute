@@ -1,10 +1,34 @@
-import { useEffect, useRef } from "react";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { PhoneFrame } from "@/components/checkit/PhoneFrame";
 import { ProfileProvider, useProfile } from "@/lib/checkit/store";
-import { VisitsProvider, useVisits, formatDateIT, visitStatus, freqLabel, TIPOLOGIE, type Visit } from "@/lib/checkit/visits";
-import { computePlan, type UserProfile } from "@/lib/checkit/rules";
-import { Home as HomeIcon, ClipboardCheck, Calendar as CalendarIcon, FileText, Plus, CheckCircle2, Shield, Target, Heart, Droplet, Sun, Eye, Stethoscope, Link2, Pencil } from "lucide-react";
+import { VisitsProvider, useVisits, freqLabel, type Visit } from "@/lib/checkit/visits";
+import { computePlan, type MatchedScreening, type UserProfile } from "@/lib/checkit/rules";
+import {
+  nextDateFromYearMonth,
+  nextDateFromIsoDate,
+  pillState,
+  pillLabels,
+  freqToMonths,
+} from "@/lib/checkit/schedule";
+import {
+  Home as HomeIcon,
+  ClipboardCheck,
+  Calendar as CalendarIcon,
+  FileText,
+  Plus,
+  CheckCircle2,
+  Shield,
+  Target,
+  Heart,
+  Droplet,
+  Sun,
+  Eye,
+  Stethoscope,
+  Pencil,
+  AlertCircle,
+  ChevronDown,
+} from "lucide-react";
 
 export const Route = createFileRoute("/app/piano")({
   head: () => ({ meta: [{ title: "CheckIt — Il tuo piano" }] }),
@@ -30,20 +54,32 @@ const screeningIcon: Record<string, React.ReactNode> = {
   mammella: <Heart size={20} strokeWidth={2.2} />,
 };
 
+const organNames: Record<string, string> = {
+  cervice_uterina: "Screening della cervice uterina",
+  mammella: "Screening mammella",
+  prostata: "Screening prostata",
+  colon_retto: "Screening colon-retto",
+};
+
+const SLOT_PILL = 56;
+const SLOT_EDIT = 40;
+
+// Actions where a cadence-based pill does NOT apply
+const NO_PILL_ACTIONS = new Set([
+  "delega_medico",
+  "richiedi_colonscopia",
+  "fare_test",
+  "primo_invito_futuro",
+]);
+
 function Inner() {
-  const { profile } = useProfile();
+  const { profile, setScreening } = useProfile();
   const { visits } = useVisits();
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
   const ready = !!profile.sesso && !!profile.eta;
   const plan = ready ? computePlan(profile as UserProfile) : [];
 
-  const organNames: Record<string, string> = {
-    cervice_uterina: "Screening della cervice uterina",
-    mammella: "Screening mammella",
-    prostata: "Screening prostata",
-    colon_retto: "Screening colon-retto",
-  };
   const diagnosed = (profile.diagnosi_oncologica ?? [])
     .filter((id) => id in organNames)
     .map((id) => ({ id, nome: organNames[id] }));
@@ -52,20 +88,24 @@ function Inner() {
   const regionali = plan.filter((p) => p.id === "prostata");
   const ssnAll = [...nazionali, ...regionali];
 
-  const racc: { nome: string; meta?: string; icon: React.ReactNode; bg: string; color: string }[] = [];
-  if (profile.familiarita_cardio === "si" || (profile.comorbidita ?? []).includes("ipertensione") || (profile.comorbidita ?? []).includes("colesterolo")) {
-    racc.push({ nome: "Cardiovascolare", meta: "Pressione e profilo lipidico", icon: <Heart size={20} strokeWidth={2.2} />, bg: "#FBE6E6", color: "#C0392B" });
+  const racc: { id: string; nome: string; meta?: string; icon: React.ReactNode; bg: string; color: string }[] = [];
+  if (
+    profile.familiarita_cardio === "si" ||
+    (profile.comorbidita ?? []).includes("ipertensione") ||
+    (profile.comorbidita ?? []).includes("colesterolo")
+  ) {
+    racc.push({ id: "cardiovascolare", nome: "Cardiovascolare", meta: "Pressione e profilo lipidico", icon: <Heart size={20} strokeWidth={2.2} />, bg: "#FBE6E6", color: "#C0392B" });
   } else {
-    racc.push({ nome: "Cardiovascolare", icon: <Heart size={20} strokeWidth={2.2} />, bg: "#FBE6E6", color: "#C0392B" });
+    racc.push({ id: "cardiovascolare", nome: "Cardiovascolare", icon: <Heart size={20} strokeWidth={2.2} />, bg: "#FBE6E6", color: "#C0392B" });
   }
   if (profile.familiarita_diabete === "si" || (profile.comorbidita ?? []).includes("diabete") || (profile.eta ?? 0) >= 45) {
-    racc.push({ nome: "Diabete", meta: "Glicemia o HbA1c", icon: <Droplet size={20} strokeWidth={2.2} />, bg: "#E6EEFB", color: "#2C6E84" });
+    racc.push({ id: "diabete", nome: "Diabete", meta: "Glicemia o HbA1c", icon: <Droplet size={20} strokeWidth={2.2} />, bg: "#E6EEFB", color: "#2C6E84" });
   }
 
   const buone = [
-    { nome: "Dermatologia", meta: profile.pelle === "chiara" || profile.nei === "molti" ? "Consigliato controllo annuale" : undefined, icon: <Sun size={20} strokeWidth={2.2} />, bg: "#FBF1DD", color: "#97681A" },
-    { nome: "Oculistica", icon: <Eye size={20} strokeWidth={2.2} />, bg: "#E6F4F0", color: "var(--teal-700)" },
-    { nome: "Controlli periodici", meta: "dal medico di base", icon: <Stethoscope size={20} strokeWidth={2.2} />, bg: "#EEF0EC", color: "var(--ink-700)" },
+    { id: "dermatologia", nome: "Dermatologia", meta: profile.pelle === "chiara" || profile.nei === "molti" ? "Consigliato controllo annuale" : undefined, icon: <Sun size={20} strokeWidth={2.2} />, bg: "#FBF1DD", color: "#97681A" },
+    { id: "oculistica", nome: "Oculistica", icon: <Eye size={20} strokeWidth={2.2} />, bg: "#E6F4F0", color: "var(--teal-700)" },
+    { id: "controlli_periodici", nome: "Controlli periodici", meta: "dal medico di base", icon: <Stethoscope size={20} strokeWidth={2.2} />, bg: "#EEF0EC", color: "var(--ink-700)" },
   ];
 
   const visitsByScreening = visits.reduce<Record<string, Visit[]>>((acc, v) => {
@@ -73,6 +113,7 @@ function Inner() {
     return acc;
   }, {});
 
+  const standaloneVisits = visits.filter((v) => !v.screening_id);
   const totaleControlli = plan.length + racc.length;
 
   const scrollToVisit = (id: string) => {
@@ -80,8 +121,12 @@ function Inner() {
     if (el) {
       el.scrollIntoView({ behavior: "smooth", block: "center" });
       el.animate(
-        [{ boxShadow: "0 0 0 0 rgba(29,158,117,0.0)" }, { boxShadow: "0 0 0 6px rgba(29,158,117,0.30)" }, { boxShadow: "0 0 0 0 rgba(29,158,117,0)" }],
-        { duration: 1200, easing: "ease-out" }
+        [
+          { boxShadow: "0 0 0 0 rgba(29,158,117,0.0)" },
+          { boxShadow: "0 0 0 6px rgba(29,158,117,0.30)" },
+          { boxShadow: "0 0 0 0 rgba(29,158,117,0)" },
+        ],
+        { duration: 1200, easing: "ease-out" },
       );
     }
   };
@@ -134,8 +179,10 @@ function Inner() {
                   title={s.nome}
                   meta={[s.regione, s.meta].filter(Boolean).join(" · ")}
                   badge={s.id === "prostata" ? { label: "Su adesione", kind: "novita" } : { label: "Gratuito", kind: "free" }}
-                  linked={visitsByScreening[s.id]}
-                  onLinked={scrollToVisit}
+                  screening={s}
+                  profile={profile as UserProfile}
+                  onSetUltimoTest={(yyyymm) => setScreening(s.id, { ultimo_test_data: yyyymm })}
+                  linkedVisits={visitsByScreening[s.id] ?? []}
                 />
               ))}
               {diagnosed.map((d) => (
@@ -145,9 +192,8 @@ function Inner() {
                   iconBg="var(--teal-100)"
                   iconColor="var(--teal-700)"
                   title={d.nome}
-                  callout="Sei già seguito da uno specialista, non rientra nello screening preventivo."
-                  linked={visitsByScreening[d.id]}
-                  onLinked={scrollToVisit}
+                  diagnosisBadge
+                  linkedVisits={visitsByScreening[d.id] ?? []}
                 />
               ))}
               {ssnAll.length === 0 && diagnosed.length === 0 && (
@@ -159,32 +205,48 @@ function Inner() {
 
             <Card eyebrow="Linee guida nazionali" subtitle="Raccomandati — parlane col tuo medico">
               {racc.map((r) => (
-                <ScreeningRow key={r.nome} icon={r.icon} iconBg={r.bg} iconColor={r.color} title={r.nome} meta={r.meta} />
+                <ScreeningRow
+                  key={r.id}
+                  icon={r.icon}
+                  iconBg={r.bg}
+                  iconColor={r.color}
+                  title={r.nome}
+                  meta={r.meta}
+                  linkedVisits={visitsByScreening[r.id] ?? []}
+                />
               ))}
             </Card>
 
             <Card eyebrow="Buone pratiche" subtitle="Da concordare con il tuo medico">
               {buone.map((r) => (
-                <ScreeningRow key={r.nome} icon={r.icon} iconBg={r.bg} iconColor={r.color} title={r.nome} meta={r.meta} />
+                <ScreeningRow
+                  key={r.id}
+                  icon={r.icon}
+                  iconBg={r.bg}
+                  iconColor={r.color}
+                  title={r.nome}
+                  meta={r.meta}
+                  linkedVisits={visitsByScreening[r.id] ?? []}
+                />
               ))}
             </Card>
 
-            {/* Le tue visite */}
-            <section style={{ marginTop: 18, marginBottom: 6, background: "var(--teal-100)", borderRadius: 18, padding: "16px 14px", boxShadow: "0 2px 8px rgba(4,52,44,0.06)" }}>
-              <div style={{ padding: "0 4px 10px" }}>
-                <div style={{ fontFamily: "var(--font-sans)", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--teal-700)" }}>Le tue visite</div>
-                <div style={{ fontFamily: "var(--font-sans)", fontSize: 14.5, color: "var(--ink-700)", marginTop: 2 }}>Visite che hai aggiunto</div>
-              </div>
-              {visits.length === 0 ? (
-                <div style={{ background: "#fff", borderRadius: 14, padding: 16, fontFamily: "var(--font-sans)", fontSize: 14.5, color: "var(--ink-500)", textAlign: "center" }}>
-                  Non hai ancora aggiunto visite. Tocca il "+" per iniziare.
+            {/* Le tue visite — solo standalone (senza screening_id) */}
+            {standaloneVisits.length > 0 && (
+              <section style={{ marginTop: 18, marginBottom: 6, background: "var(--teal-100)", borderRadius: 18, padding: "16px 14px", boxShadow: "0 2px 8px rgba(4,52,44,0.06)" }}>
+                <div style={{ padding: "0 4px 10px" }}>
+                  <div style={{ fontFamily: "var(--font-sans)", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--teal-700)" }}>Le tue visite</div>
+                  <div style={{ fontFamily: "var(--font-sans)", fontSize: 14.5, color: "var(--ink-700)", marginTop: 2 }}>Visite che hai aggiunto</div>
                 </div>
-              ) : (
                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  {visits.map((v) => <VisitCard key={v.id} v={v} screeningName={v.screening_id ? organNames[v.screening_id] ?? null : null} />)}
+                  {standaloneVisits.map((v) => (
+                    <div key={v.id} data-visita-id={v.id} style={{ background: "#fff", borderRadius: 14, padding: "12px 12px 12px 14px" }}>
+                      <VisitInlineRow v={v} />
+                    </div>
+                  ))}
                 </div>
-              )}
-            </section>
+              </section>
+            )}
           </>
         )}
       </div>
@@ -212,7 +274,6 @@ function Inner() {
         <Plus size={28} strokeWidth={2.6} />
       </Link>
 
-      {/* Bottom nav */}
       <BottomNav />
     </>
   );
@@ -233,21 +294,97 @@ function Card({ eyebrow, subtitle, children }: { eyebrow: string; subtitle?: str
   );
 }
 
-function ScreeningRow({ icon, iconBg, iconColor, title, meta, badge, callout, linked, onLinked }: {
+// ---------------------------------------------------------------------------
+// Pill: due-date chip (mese/anno)
+// ---------------------------------------------------------------------------
+
+function PillSlot({ children }: { children?: React.ReactNode }) {
+  return (
+    <div style={{ width: SLOT_PILL, flexShrink: 0, display: "flex", justifyContent: "flex-end", alignItems: "center" }}>
+      {children}
+    </div>
+  );
+}
+
+function EditSlot({ children }: { children?: React.ReactNode }) {
+  return (
+    <div style={{ width: SLOT_EDIT, flexShrink: 0, display: "flex", justifyContent: "center", alignItems: "center" }}>
+      {children}
+    </div>
+  );
+}
+
+function DuePill({ date }: { date: Date }) {
+  const state = pillState(date);
+  const { mese, anno } = pillLabels(date);
+  const bg = state === "futura" ? "#E1F5EE" : "#FBF1DD";
+  const fg = state === "futura" ? "#0F6E56" : "#97681A";
+  return (
+    <div
+      aria-label={`Scadenza ${mese} ${anno} (${state})`}
+      style={{
+        width: 52,
+        minHeight: 52,
+        borderRadius: 12,
+        background: bg,
+        color: fg,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "6px 4px",
+        fontFamily: "var(--font-sans)",
+        lineHeight: 1.05,
+      }}
+    >
+      <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.04em" }}>{mese}</div>
+      <div style={{ fontSize: 13, fontWeight: 700, marginTop: 2 }}>{anno}</div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// ScreeningRow
+// ---------------------------------------------------------------------------
+
+interface ScreeningRowProps {
   icon: React.ReactNode;
   iconBg: string;
   iconColor: string;
   title: string;
   meta?: string;
   badge?: { label: string; kind: "free" | "novita" };
-  callout?: string;
-  linked?: Visit[];
-  onLinked?: (id: string) => void;
-}) {
+  screening?: MatchedScreening;
+  profile?: UserProfile;
+  onSetUltimoTest?: (yyyymm: string) => void;
+  diagnosisBadge?: boolean;
+  linkedVisits?: Visit[];
+}
+
+function ScreeningRow({
+  icon, iconBg, iconColor, title, meta, badge,
+  screening, profile, onSetUltimoTest,
+  diagnosisBadge, linkedVisits = [],
+}: ScreeningRowProps) {
+  // Determine pill / missing-data state
+  const screenState = screening && profile ? profile.screenings?.[screening.id] ?? {} : {};
+  const cadenceApplies = !!screening
+    && !diagnosisBadge
+    && !!screening.cadenza_mesi
+    && !NO_PILL_ACTIONS.has(screening.azione);
+
+  const hasLastTestDate = !!screenState.ultimo_test_data && !screenState.data_da_completare;
+  const dueDate = cadenceApplies && hasLastTestDate
+    ? nextDateFromYearMonth(screenState.ultimo_test_data!, screening!.cadenza_mesi!)
+    : null;
+
+  const needsLastTest = cadenceApplies && !hasLastTestDate && !!onSetUltimoTest;
+
   return (
-    <div style={{ padding: "12px 4px", borderTop: "1px solid var(--line-100)", display: "flex", flexDirection: "column", gap: 10 }}>
+    <div style={{ padding: "12px 4px", borderTop: "1px solid var(--line-100)" }}>
       <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
         <span style={{ flexShrink: 0, width: 38, height: 38, borderRadius: "50%", background: iconBg, color: iconColor, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>{icon}</span>
+
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
             <div style={{ flex: 1, minWidth: 0, fontFamily: "var(--font-sans)", fontSize: 17, fontWeight: 700, color: "var(--teal-900)", letterSpacing: "-0.01em", lineHeight: 1.25 }}>
@@ -267,65 +404,209 @@ function ScreeningRow({ icon, iconBg, iconColor, title, meta, badge, callout, li
           {meta && (
             <div style={{ marginTop: 2, fontFamily: "var(--font-sans)", fontSize: 14, color: "var(--ink-500)" }}>{meta}</div>
           )}
-          {callout && (
-            <div style={{ marginTop: 8, padding: "10px 10px", background: "#FBF1DD", borderLeft: "3px solid #D4942A", borderRadius: 8, fontFamily: "var(--font-sans)", fontSize: 13, color: "#7A5310", lineHeight: 1.35 }}>
-              {callout}
-            </div>
+
+          {diagnosisBadge && <DiagnosisToggle />}
+
+          {needsLastTest && (
+            <MissingDataAlert onSubmit={(yyyymm) => onSetUltimoTest!(yyyymm)} />
           )}
         </div>
+
+        {/* Reserved columns */}
+        <EditSlot />
+        <PillSlot>{dueDate && <DuePill date={dueDate} />}</PillSlot>
       </div>
 
-      {linked && linked.length > 0 && (
-        <button
-          type="button"
-          onClick={() => onLinked?.(linked[0].id)}
-          style={{ marginLeft: 50, alignSelf: "flex-start", display: "inline-flex", alignItems: "center", gap: 6, padding: 0, background: "transparent", border: "none", color: "var(--teal-700)", fontFamily: "var(--font-sans)", fontSize: 13.5, fontWeight: 700, cursor: "pointer" }}
-        >
-          <Link2 size={15} strokeWidth={2.2} />
-          Hai una visita collegata · Vedi sotto
-        </button>
+      {/* Linked visits (inline "AGGIUNTE DA TE") */}
+      {linkedVisits.length > 0 && (
+        <div style={{ marginTop: 10, marginLeft: 50, borderLeft: "3px solid var(--teal-500)", paddingLeft: 12 }}>
+          <div style={{ fontFamily: "var(--font-sans)", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--teal-700)", marginBottom: 6 }}>
+            AGGIUNTE DA TE:
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {linkedVisits.map((v) => (
+              <div key={v.id} data-visita-id={v.id} style={{ padding: "8px 2px" }}>
+                <VisitInlineRow v={v} />
+              </div>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );
 }
 
-function VisitCard({ v, screeningName }: { v: Visit; screeningName: string | null }) {
-  const status = visitStatus(v.data);
-  const dateLabel = formatDateIT(v.data);
-  const tipologia = v.tipologia === "altro"
-    ? (v.tipologia_altro ?? "Altro")
-    : TIPOLOGIE.find((t) => t.value === v.tipologia)?.label ?? v.tipologia;
+// ---------------------------------------------------------------------------
+// Diagnosis badge (toggle)
+// ---------------------------------------------------------------------------
 
+function DiagnosisToggle() {
+  const [open, setOpen] = useState(false);
   return (
-    <div data-visita-id={v.id} style={{ background: "#fff", borderRadius: 14, padding: "14px 14px 14px 16px", display: "flex", alignItems: "flex-start", gap: 10 }}>
-      <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontFamily: "var(--font-sans)", fontSize: 11, fontWeight: 700, letterSpacing: "0.07em", textTransform: "uppercase", color: "var(--teal-700)", marginBottom: 4 }}>
-          {tipologia}
-        </div>
-        <div style={{ fontFamily: "var(--font-sans)", fontSize: 17, fontWeight: 700, color: "var(--teal-900)", lineHeight: 1.25, letterSpacing: "-0.01em" }}>
-          {v.nome}
-        </div>
-        <div style={{ marginTop: 6, fontFamily: "var(--font-sans)", fontSize: 14, color: "var(--ink-700)" }}>
-          {freqLabel(v.frequenza_n, v.frequenza_u)} · {status === "futura" ? "Prossima" : "Ultima"}: <strong style={{ color: "var(--teal-900)", fontWeight: 700 }}>{dateLabel}</strong>
-        </div>
-        {screeningName && (
-          <div style={{ marginTop: 8, display: "inline-flex", alignItems: "center", gap: 6, fontFamily: "var(--font-sans)", fontSize: 13, color: "var(--teal-700)", fontWeight: 600 }}>
-            <Link2 size={14} strokeWidth={2.2} />
-            Collegata a {screeningName}
-          </div>
-        )}
-      </div>
-      <Link
-        to="/visita"
-        search={{ id: v.id }}
-        aria-label={`Modifica ${v.nome}`}
-        style={{ width: 44, height: 44, display: "inline-flex", alignItems: "center", justifyContent: "center", borderRadius: 10, color: "var(--teal-700)", flexShrink: 0 }}
+    <div style={{ marginTop: 8 }}>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 6,
+          padding: "6px 10px",
+          borderRadius: 999,
+          background: "#FBF1DD",
+          color: "#97681A",
+          border: "none",
+          cursor: "pointer",
+          fontFamily: "var(--font-sans)",
+          fontSize: 13,
+          fontWeight: 700,
+        }}
       >
-        <Pencil size={18} strokeWidth={2.2} />
-      </Link>
+        <Stethoscope size={15} strokeWidth={2.2} />
+        Sei seguito da uno specialista
+        <ChevronDown
+          size={15}
+          strokeWidth={2.4}
+          style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform 180ms" }}
+        />
+      </button>
+      {open && (
+        <div style={{ marginTop: 8, padding: "10px 10px", background: "#FBF1DD", borderLeft: "3px solid #D9A93E", borderRadius: 8, fontFamily: "var(--font-sans)", fontSize: 13, color: "#7A5310", lineHeight: 1.4 }}>
+          Avendo una diagnosi in corso, non rientri nello screening preventivo: il percorso lo definisce il tuo specialista.
+        </div>
+      )}
     </div>
   );
 }
+
+// ---------------------------------------------------------------------------
+// Missing-data alert + inline date entry
+// ---------------------------------------------------------------------------
+
+function MissingDataAlert({ onSubmit }: { onSubmit: (yyyymm: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState("");
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        style={{
+          marginTop: 8,
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          width: "100%",
+          padding: "10px 12px",
+          background: "#FBF1DD",
+          borderLeft: "3px solid #D9A93E",
+          borderRadius: 8,
+          border: "none",
+          cursor: "pointer",
+          textAlign: "left",
+          fontFamily: "var(--font-sans)",
+          fontSize: 13.5,
+          color: "#7A5310",
+          fontWeight: 600,
+        }}
+      >
+        <AlertCircle size={16} strokeWidth={2.2} />
+        Completa le informazioni mancanti
+      </button>
+    );
+  }
+  return (
+    <div style={{ marginTop: 8, padding: "10px 10px", background: "#FBF1DD", borderLeft: "3px solid #D9A93E", borderRadius: 8 }}>
+      <div style={{ fontFamily: "var(--font-sans)", fontSize: 13, color: "#7A5310", marginBottom: 8, fontWeight: 600 }}>
+        Quando hai fatto l'ultimo test?
+      </div>
+      <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        <input
+          type="month"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          style={{
+            flex: 1,
+            padding: "10px 12px",
+            borderRadius: 8,
+            border: "1.5px solid #D9A93E",
+            background: "#fff",
+            fontFamily: "var(--font-sans)",
+            fontSize: 14,
+            color: "var(--teal-900)",
+            outline: "none",
+          }}
+        />
+        <button
+          type="button"
+          disabled={!value}
+          onClick={() => {
+            if (value) {
+              onSubmit(value);
+              setOpen(false);
+            }
+          }}
+          style={{
+            padding: "10px 14px",
+            borderRadius: 8,
+            border: "none",
+            background: value ? "#97681A" : "#D9C293",
+            color: "#fff",
+            fontFamily: "var(--font-sans)",
+            fontSize: 13.5,
+            fontWeight: 700,
+            cursor: value ? "pointer" : "not-allowed",
+          }}
+        >
+          Salva
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// VisitInlineRow — used both inline under a screening and in "Le tue visite"
+// Layout: [contenuto][matita][pill]  — colonne riservate
+// ---------------------------------------------------------------------------
+
+function VisitInlineRow({ v }: { v: Visit }) {
+  const navigate = useNavigate();
+  const months = freqToMonths(v.frequenza_n, v.frequenza_u);
+  const next = v.data ? nextDateFromIsoDate(v.data, months) : null;
+
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontFamily: "var(--font-sans)", fontSize: 16, fontWeight: 700, color: "var(--teal-900)", lineHeight: 1.25, letterSpacing: "-0.01em" }}>
+          {v.nome}
+        </div>
+        <div style={{ marginTop: 2, fontFamily: "var(--font-sans)", fontSize: 13.5, color: "var(--ink-500)" }}>
+          {freqLabel(v.frequenza_n, v.frequenza_u)}
+        </div>
+      </div>
+      <EditSlot>
+        <button
+          type="button"
+          aria-label={`Modifica ${v.nome}`}
+          onClick={() => navigate({ to: "/visita", search: { id: v.id } })}
+          style={{
+            width: 36, height: 36, display: "inline-flex", alignItems: "center", justifyContent: "center",
+            borderRadius: 8, color: "var(--teal-700)", background: "transparent", border: "none", cursor: "pointer",
+          }}
+        >
+          <Pencil size={17} strokeWidth={2.2} />
+        </button>
+      </EditSlot>
+      <PillSlot>{next && <DuePill date={next} />}</PillSlot>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Bottom nav
+// ---------------------------------------------------------------------------
 
 function BottomNav() {
   return (

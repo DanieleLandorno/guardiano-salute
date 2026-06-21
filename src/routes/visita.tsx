@@ -72,11 +72,50 @@ function Inner() {
   const [data, setData] = useState<string>(editing?.data ?? "");
   const [confirmDelete, setConfirmDelete] = useState(false);
 
-  // Available screenings from user's plan
-  const plan = useMemo(() => {
+  // Available screenings, grouped for the selector
+  const planGroups = useMemo(() => {
     const ready = !!profile.sesso && !!profile.eta;
-    return ready ? computePlan(profile as UserProfile) : [];
+    const plan = ready ? computePlan(profile as UserProfile) : [];
+
+    const nazionali = plan.filter((p) => ["cervice_uterina", "mammella", "colon_retto"].includes(p.id));
+    const regionali = plan.filter((p) => p.id === "prostata");
+    const ssn = [...nazionali, ...regionali].map((p) => ({ id: p.id, nome: p.nome }));
+
+    const organNames: Record<string, string> = {
+      cervice_uterina: "Screening della cervice uterina",
+      mammella: "Screening mammella",
+      prostata: "Screening prostata",
+      colon_retto: "Screening colon-retto",
+    };
+    const diagnosed = (profile.diagnosi_oncologica ?? [])
+      .filter((id) => id in organNames)
+      .map((id) => ({ id, nome: organNames[id] }));
+
+    const racc: { id: string; nome: string }[] = [];
+    if (
+      profile.familiarita_cardio === "si" ||
+      (profile.comorbidita ?? []).includes("ipertensione") ||
+      (profile.comorbidita ?? []).includes("colesterolo")
+    ) {
+      racc.push({ id: "cardiovascolare", nome: "Cardiovascolare" });
+    } else {
+      racc.push({ id: "cardiovascolare", nome: "Cardiovascolare" });
+    }
+    if (profile.familiarita_diabete === "si" || (profile.comorbidita ?? []).includes("diabete") || (profile.eta ?? 0) >= 45) {
+      racc.push({ id: "diabete", nome: "Diabete" });
+    }
+
+    const buone = [
+      { id: "dermatologia", nome: "Dermatologia" },
+      { id: "oculistica", nome: "Oculistica" },
+      { id: "controlli_periodici", nome: "Controlli periodici" },
+    ];
+
+    return { ssn, racc, buone, diagnosed };
   }, [profile]);
+
+  const hasAnyScreening =
+    planGroups.ssn.length + planGroups.racc.length + planGroups.buone.length + planGroups.diagnosed.length > 0;
 
   const valid =
     !!tipologia &&
@@ -137,6 +176,20 @@ function Inner() {
           {isEdit ? "Aggiorna i dati della tua visita." : "Registra una visita ricorrente che già fai."}
         </p>
 
+        {/* Nome personalizzato (primo campo) */}
+        <div style={{ marginBottom: 18 }}>
+          <label style={labelStyle} htmlFor="nome">Nome personalizzato</label>
+          <input
+            id="nome"
+            type="text"
+            value={nome}
+            onChange={(e) => setNome(e.target.value)}
+            placeholder="es. Visita oncologica colon-retto"
+            style={inputBase}
+          />
+          <div style={microStyle}>Come vuoi chiamarla nel piano.</div>
+        </div>
+
         {/* Tipologia */}
         <div style={{ marginBottom: 18 }}>
           <label style={labelStyle} htmlFor="tipologia">Tipologia di visita</label>
@@ -174,25 +227,31 @@ function Inner() {
               style={{ ...inputBase, marginTop: 10, color: screeningId ? "var(--teal-900)" : "var(--ink-400)", appearance: "none", backgroundImage: "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2304342C' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 16px center", paddingRight: 40 }}
             >
               <option value="" disabled>Seleziona uno screening…</option>
-              {plan.map((p) => <option key={p.id} value={p.id}>{p.nome}</option>)}
-              {plan.length === 0 && <option value="" disabled>Nessuno screening nel tuo piano</option>}
+              {planGroups.ssn.length > 0 && (
+                <optgroup label="Programmi del SSN">
+                  {planGroups.ssn.map((p) => <option key={p.id} value={p.id}>{p.nome}</option>)}
+                </optgroup>
+              )}
+              {planGroups.racc.length > 0 && (
+                <optgroup label="Linee guida nazionali">
+                  {planGroups.racc.map((p) => <option key={p.id} value={p.id}>{p.nome}</option>)}
+                </optgroup>
+              )}
+              {planGroups.buone.length > 0 && (
+                <optgroup label="Buone pratiche">
+                  {planGroups.buone.map((p) => <option key={p.id} value={p.id}>{p.nome}</option>)}
+                </optgroup>
+              )}
+              {planGroups.diagnosed.length > 0 && (
+                <optgroup label="Sei seguito da uno specialista">
+                  {planGroups.diagnosed.map((p) => <option key={p.id} value={p.id}>{p.nome}</option>)}
+                </optgroup>
+              )}
+              {!hasAnyScreening && <option value="" disabled>Nessuno screening disponibile</option>}
             </select>
           )}
         </div>
 
-        {/* Nome personalizzato */}
-        <div style={{ marginBottom: 18 }}>
-          <label style={labelStyle} htmlFor="nome">Nome personalizzato</label>
-          <input
-            id="nome"
-            type="text"
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
-            placeholder="es. Visita oncologica colon-retto"
-            style={inputBase}
-          />
-          <div style={microStyle}>Come vuoi chiamarla nel piano.</div>
-        </div>
 
         {/* Frequenza */}
         <div style={{ marginBottom: 18 }}>
