@@ -176,6 +176,20 @@ function Inner() {
           {isEdit ? "Aggiorna i dati della tua visita." : "Registra una visita ricorrente che già fai."}
         </p>
 
+        {/* Nome personalizzato (primo campo) */}
+        <div style={{ marginBottom: 18 }}>
+          <label style={labelStyle} htmlFor="nome">Nome personalizzato</label>
+          <input
+            id="nome"
+            type="text"
+            value={nome}
+            onChange={(e) => setNome(e.target.value)}
+            placeholder="es. Visita oncologica colon-retto"
+            style={inputBase}
+          />
+          <div style={microStyle}>Come vuoi chiamarla nel piano.</div>
+        </div>
+
         {/* Tipologia */}
         <div style={{ marginBottom: 18 }}>
           <label style={labelStyle} htmlFor="tipologia">Tipologia di visita</label>
@@ -213,25 +227,31 @@ function Inner() {
               style={{ ...inputBase, marginTop: 10, color: screeningId ? "var(--teal-900)" : "var(--ink-400)", appearance: "none", backgroundImage: "url(\"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2304342C' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 16px center", paddingRight: 40 }}
             >
               <option value="" disabled>Seleziona uno screening…</option>
-              {plan.map((p) => <option key={p.id} value={p.id}>{p.nome}</option>)}
-              {plan.length === 0 && <option value="" disabled>Nessuno screening nel tuo piano</option>}
+              {planGroups.ssn.length > 0 && (
+                <optgroup label="Programmi del SSN">
+                  {planGroups.ssn.map((p) => <option key={p.id} value={p.id}>{p.nome}</option>)}
+                </optgroup>
+              )}
+              {planGroups.racc.length > 0 && (
+                <optgroup label="Linee guida nazionali">
+                  {planGroups.racc.map((p) => <option key={p.id} value={p.id}>{p.nome}</option>)}
+                </optgroup>
+              )}
+              {planGroups.buone.length > 0 && (
+                <optgroup label="Buone pratiche">
+                  {planGroups.buone.map((p) => <option key={p.id} value={p.id}>{p.nome}</option>)}
+                </optgroup>
+              )}
+              {planGroups.diagnosed.length > 0 && (
+                <optgroup label="Sei seguito da uno specialista">
+                  {planGroups.diagnosed.map((p) => <option key={p.id} value={p.id}>{p.nome}</option>)}
+                </optgroup>
+              )}
+              {!hasAnyScreening && <option value="" disabled>Nessuno screening disponibile</option>}
             </select>
           )}
         </div>
 
-        {/* Nome personalizzato */}
-        <div style={{ marginBottom: 18 }}>
-          <label style={labelStyle} htmlFor="nome">Nome personalizzato</label>
-          <input
-            id="nome"
-            type="text"
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
-            placeholder="es. Visita oncologica colon-retto"
-            style={inputBase}
-          />
-          <div style={microStyle}>Come vuoi chiamarla nel piano.</div>
-        </div>
 
         {/* Frequenza */}
         <div style={{ marginBottom: 18 }}>
