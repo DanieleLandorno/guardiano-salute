@@ -376,6 +376,7 @@ function ScreeningRow({
   screening, profile, onSetUltimoTest,
   diagnosisBadge, linkedVisits = [],
 }: ScreeningRowProps) {
+  const [diagOpen, setDiagOpen] = useState(false);
   // Determine pill / missing-data state
   const screenState = screening && profile ? profile.screenings?.[screening.id] ?? {} : {};
   const cadenceApplies = !!screening
@@ -409,16 +410,23 @@ function ScreeningRow({
             </div>
           )}
 
-          {diagnosisBadge && <DiagnosisToggle />}
+          {diagnosisBadge && <DiagnosisToggleButton open={diagOpen} onToggle={() => setDiagOpen((o) => !o)} />}
 
           {needsLastTest && (
             <MissingDataAlert onSubmit={(yyyymm) => onSetUltimoTest!(yyyymm)} />
           )}
         </div>
 
-        {/* Reserved column */}
-        <PillSlot>{dueDate && <DuePill date={dueDate} />}</PillSlot>
+        {/* Reserved column — omitted entirely for diagnosis rows so expanded note can go full width */}
+        {!diagnosisBadge && <PillSlot>{dueDate && <DuePill date={dueDate} />}</PillSlot>}
       </div>
+
+      {/* Diagnosis expanded note — full width */}
+      {diagnosisBadge && diagOpen && (
+        <div style={{ marginTop: 8, padding: "10px 12px", background: "#FBF1DD", borderLeft: "3px solid #D9A93E", borderRadius: 8, fontFamily: "var(--font-sans)", fontSize: 13, color: "#7A5310", lineHeight: 1.4 }}>
+          Avendo una diagnosi in corso, non rientri nello screening preventivo: il percorso lo definisce il tuo specialista.
+        </div>
+      )}
 
       {/* Linked visits (inline "AGGIUNTE DA TE") */}
       {linkedVisits.length > 0 && (
