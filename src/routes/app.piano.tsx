@@ -86,7 +86,16 @@ function Inner() {
 
   const nazionali = plan.filter((p) => ["cervice_uterina", "mammella", "colon_retto"].includes(p.id));
   const regionali = plan.filter((p) => p.id === "prostata");
-  const ssnAll = [...nazionali, ...regionali];
+  const planSsn = [...nazionali, ...regionali];
+  const diagnosedIds = new Set(diagnosed.map((d) => d.id));
+  type SsnEntry = { key: string; id: string; nome: string; screening?: MatchedScreening; isDiagnosed: boolean };
+  const ssnAll: SsnEntry[] = [
+    ...planSsn.map<SsnEntry>((s) => ({ key: s.id, id: s.id, nome: s.nome, screening: s, isDiagnosed: diagnosedIds.has(s.id) })),
+    ...diagnosed
+      .filter((d) => !planSsn.some((s) => s.id === d.id))
+      .map<SsnEntry>((d) => ({ key: d.id, id: d.id, nome: d.nome, isDiagnosed: true })),
+  ];
+  const diagnosedExtra = diagnosed.filter((d) => !planSsn.some((s) => s.id === d.id)).length;
 
   const racc: { id: string; nome: string; meta?: string; icon: React.ReactNode; bg: string; color: string }[] = [];
   if (
@@ -114,7 +123,7 @@ function Inner() {
   }, {});
 
   const standaloneVisits = visits.filter((v) => !v.screening_id);
-  const totaleControlli = plan.length + diagnosed.length + racc.length + buone.length;
+  const totaleControlli = plan.length + diagnosedExtra + racc.length + buone.length;
 
   const scrollToVisit = (id: string) => {
     const el = scrollRef.current?.querySelector(`[data-visita-id="${id}"]`) as HTMLElement | null;
@@ -172,16 +181,27 @@ function Inner() {
             <Card eyebrow="Programmi del SSN" subtitle="Previsti dal Servizio Sanitario Nazionale">
               {ssnAll.map((s) => (
                 <ScreeningRow
-                  key={s.id}
+                  key={s.key}
                   icon={screeningIcon[s.id] ?? <Shield size={20} strokeWidth={2.2} />}
                   iconBg="var(--teal-100)"
                   iconColor="var(--teal-700)"
                   title={s.nome}
-                  meta={[s.regione, s.meta].filter(Boolean).join(" · ")}
-                  badge={s.id === "prostata" ? { label: "Su adesione", kind: "novita" } : { label: "Gratuito", kind: "free" }}
-                  screening={s}
-                  profile={profile as UserProfile}
-                  onSetUltimoTest={(yyyymm) => setScreening(s.id, { ultimo_test_data: yyyymm })}
+                  meta={s.screening ? [s.screening.regione, s.screening.meta].filter(Boolean).join(" · ") : undefined}
+                  badge={
+                    !s.isDiagnosed && s.screening
+                      ? s.id === "prostata"
+                        ? { label: "Su adesione", kind: "novita" }
+                        : { label: "Gratuito", kind: "free" }
+                      : undefined
+                  }
+                  screening={!s.isDiagnosed ? s.screening : undefined}
+                  profile={!s.isDiagnosed ? (profile as UserProfile) : undefined}
+                  onSetUltimoTest={
+                    !s.isDiagnosed && s.screening
+                      ? (yyyymm) => setScreening(s.id, { ultimo_test_data: yyyymm })
+                      : undefined
+                  }
+                  diagnosisBadge={s.isDiagnosed}
                   linkedVisits={visitsByScreening[s.id] ?? []}
                 />
               ))}
@@ -191,22 +211,6 @@ function Inner() {
                 </div>
               )}
             </Card>
-
-            {diagnosed.length > 0 && (
-              <Card eyebrow="Sei seguito da uno specialista" subtitle="Screening con diagnosi in corso — il percorso lo definisce il tuo specialista">
-                {diagnosed.map((d) => (
-                  <ScreeningRow
-                    key={d.id}
-                    icon={screeningIcon[d.id] ?? <Shield size={20} strokeWidth={2.2} />}
-                    iconBg="var(--teal-100)"
-                    iconColor="var(--teal-700)"
-                    title={d.nome}
-                    diagnosisBadge
-                    linkedVisits={visitsByScreening[d.id] ?? []}
-                  />
-                ))}
-              </Card>
-            )}
 
             <Card eyebrow="Linee guida nazionali" subtitle="Raccomandati — parlane col tuo medico">
               {racc.map((r) => (
@@ -236,23 +240,24 @@ function Inner() {
               ))}
             </Card>
 
-            {/* Le tue visite — solo standalone (senza screening_id) */}
-            {standaloneVisits.length > 0 && (
-              <section style={{ marginTop: 18, marginBottom: 6, background: "var(--teal-100)", borderRadius: 18, padding: "16px 14px", boxShadow: "0 2px 8px rgba(4,52,44,0.06)" }}>
-                <div style={{ padding: "0 4px 10px" }}>
-                  <div style={{ fontFamily: "var(--font-sans)", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--teal-700)" }}>Le tue visite</div>
-                  <div style={{ fontFamily: "var(--font-sans)", fontSize: 14.5, color: "var(--ink-700)", marginTop: 2 }}>Visite che hai aggiunto</div>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  {standaloneVisits.map((v) => (
-                    <div key={v.id} data-visita-id={v.id} style={{ background: "#fff", borderRadius: 14, padding: "12px 12px 12px 14px" }}>
-                      <VisitInlineRow v={v} />
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
           </>
+        )}
+
+        {/* Le tue visite — solo standalone (senza screening_id) */}
+        {standaloneVisits.length > 0 && (
+          <section style={{ marginTop: 18, marginBottom: 6, background: "var(--teal-100)", borderRadius: 18, padding: "16px 14px", boxShadow: "0 2px 8px rgba(4,52,44,0.06)" }}>
+            <div style={{ padding: "0 4px 10px" }}>
+              <div style={{ fontFamily: "var(--font-sans)", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--teal-700)" }}>Le tue visite</div>
+              <div style={{ fontFamily: "var(--font-sans)", fontSize: 14.5, color: "var(--ink-700)", marginTop: 2 }}>Visite che hai aggiunto</div>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {standaloneVisits.map((v) => (
+                <div key={v.id} data-visita-id={v.id} style={{ background: "#fff", borderRadius: 14, padding: "12px 12px 12px 14px" }}>
+                  <VisitInlineRow v={v} />
+                </div>
+              ))}
+            </div>
+          </section>
         )}
       </div>
 
@@ -417,13 +422,13 @@ function ScreeningRow({
 
       {/* Linked visits (inline "AGGIUNTE DA TE") */}
       {linkedVisits.length > 0 && (
-        <div style={{ marginTop: 10, marginLeft: 50, borderLeft: "3px solid var(--teal-500)", paddingLeft: 12 }}>
-          <div style={{ fontFamily: "var(--font-sans)", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--teal-700)", marginBottom: 6 }}>
+        <div style={{ marginTop: 6, marginLeft: 50, borderLeft: "3px solid var(--teal-500)", paddingLeft: 12 }}>
+          <div style={{ fontFamily: "var(--font-sans)", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--teal-700)", marginBottom: 4 }}>
             AGGIUNTE DA TE:
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {linkedVisits.map((v) => (
-              <div key={v.id} data-visita-id={v.id} style={{ padding: "8px 2px" }}>
+              <div key={v.id} data-visita-id={v.id} style={{ padding: "4px 2px" }}>
                 <VisitInlineRow v={v} />
               </div>
             ))}
