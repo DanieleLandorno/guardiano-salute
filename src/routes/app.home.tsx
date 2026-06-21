@@ -4,7 +4,7 @@ import { PhoneFrame } from "@/components/checkit/PhoneFrame";
 import { ProfileProvider, useProfile } from "@/lib/checkit/store";
 import { VisitsProvider } from "@/lib/checkit/visits";
 import { computePlan, type UserProfile } from "@/lib/checkit/rules";
-import { nextDateFromYearMonth, pillLabels } from "@/lib/checkit/schedule";
+import { nextDateFromYearMonth } from "@/lib/checkit/schedule";
 import { Progress } from "@/components/ui/progress";
 import {
   Clock,
@@ -66,14 +66,11 @@ function Inner() {
   const prenotato = !!(screenState as { prenotato?: boolean }).prenotato;
   const screeningDaPrenotare = !!next && !prenotato;
 
-  // Date pill (mese/anno) when we have ultimo_test_data + cadenza
-  let mese: string | null = null;
-  let anno: string | null = null;
+  // Extended month/year (lowercase) for the next screening subtitle
+  let dataEstesa: string | null = null;
   if (next?.cadenza_mesi && screenState.ultimo_test_data && !screenState.data_da_completare) {
     const d = nextDateFromYearMonth(screenState.ultimo_test_data, next.cadenza_mesi);
-    const lbl = pillLabels(d);
-    mese = lbl.mese;
-    anno = lbl.anno;
+    dataEstesa = d.toLocaleDateString("it-IT", { month: "long", year: "numeric" });
   }
 
   return (
@@ -104,8 +101,7 @@ function Inner() {
           <HeroScreening
             stato={screeningDaPrenotare ? "A" : "B"}
             nome={next?.nome ?? null}
-            mese={mese}
-            anno={anno}
+            dataEstesa={dataEstesa}
           />
 
           <RefertoCard />
@@ -158,8 +154,8 @@ function QuestionarioCard({
 
       <Link
         to="/questionario"
-        className="mt-5 flex w-full items-center justify-center rounded-2xl py-3 text-[15px] font-semibold text-white"
-        style={{ background: "#E24B4A" }}
+        className="mt-5 flex w-full items-center justify-center rounded-2xl py-3 text-[15px] font-semibold !text-white"
+        style={{ background: "#E24B4A", color: "#FFFFFF" }}
       >
         Riprendi da dove eri
       </Link>
@@ -170,13 +166,11 @@ function QuestionarioCard({
 function HeroScreening({
   stato,
   nome,
-  mese,
-  anno,
+  dataEstesa,
 }: {
   stato: "A" | "B";
   nome: string | null;
-  mese: string | null;
-  anno: string | null;
+  dataEstesa: string | null;
 }) {
   return (
     <section className="rounded-3xl p-6" style={{ background: "#04342C" }}>
@@ -208,7 +202,7 @@ function HeroScreening({
             {nome ?? "Nessuno screening attivo"}
           </h2>
           <p className="mt-1 text-[14.5px]" style={{ color: "#9FE1CB" }}>
-            {mese ? `Consigliata entro ${mese}` : "Consigliata a breve"}
+            {dataEstesa ? `Da fare entro ${dataEstesa}` : "Da fare a breve"}
           </p>
           <button
             type="button"
@@ -237,7 +231,7 @@ function HeroScreening({
               </div>
               <div className="mt-2 text-[15px] text-white">
                 {nome}
-                {mese && anno ? ` · ${mese} ${anno}` : ""}
+                {dataEstesa ? ` · ${dataEstesa}` : ""}
               </div>
             </div>
           )}
