@@ -243,13 +243,13 @@ function Inner() {
           </>
         )}
 
-        {/* Le tue visite — solo standalone (senza screening_id) */}
-        {standaloneVisits.length > 0 && (
-          <section style={{ marginTop: 18, marginBottom: 6, background: "var(--teal-100)", borderRadius: 18, padding: "16px 14px", boxShadow: "0 2px 8px rgba(4,52,44,0.06)" }}>
-            <div style={{ padding: "0 4px 10px" }}>
-              <div style={{ fontFamily: "var(--font-sans)", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--teal-700)" }}>Le tue visite</div>
-              <div style={{ fontFamily: "var(--font-sans)", fontSize: 14.5, color: "var(--ink-700)", marginTop: 2 }}>Visite che hai aggiunto</div>
-            </div>
+        {/* Le tue visite — solo standalone (senza screening_id); sempre visibile */}
+        <section style={{ marginTop: 18, marginBottom: 6, background: "var(--teal-100)", borderRadius: 18, padding: "16px 14px", boxShadow: "0 2px 8px rgba(4,52,44,0.06)" }}>
+          <div style={{ padding: "0 4px 10px" }}>
+            <div style={{ fontFamily: "var(--font-sans)", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--teal-700)" }}>Le tue visite</div>
+            <div style={{ fontFamily: "var(--font-sans)", fontSize: 14.5, color: "var(--ink-700)", marginTop: 2 }}>Visite che hai aggiunto</div>
+          </div>
+          {standaloneVisits.length > 0 ? (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {standaloneVisits.map((v) => (
                 <div key={v.id} data-visita-id={v.id} style={{ background: "#fff", borderRadius: 14, padding: "12px 12px 12px 14px" }}>
@@ -257,8 +257,35 @@ function Inner() {
                 </div>
               ))}
             </div>
-          </section>
-        )}
+          ) : (
+            <div style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", display: "flex", flexDirection: "column", gap: 12 }}>
+              <div style={{ fontFamily: "var(--font-sans)", fontSize: 14, color: "var(--ink-500)", lineHeight: 1.4 }}>
+                Non hai ancora aggiunto visite personali
+              </div>
+              <Link
+                to="/visita"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 6,
+                  alignSelf: "flex-start",
+                  padding: "10px 16px",
+                  borderRadius: 999,
+                  background: "var(--teal-500)",
+                  color: "#fff",
+                  textDecoration: "none",
+                  fontFamily: "var(--font-sans)",
+                  fontSize: 14.5,
+                  fontWeight: 700,
+                }}
+              >
+                <Plus size={16} strokeWidth={2.6} />
+                Aggiungi una visita
+              </Link>
+            </div>
+          )}
+        </section>
       </div>
 
       {/* FAB */}
@@ -376,6 +403,7 @@ function ScreeningRow({
   screening, profile, onSetUltimoTest,
   diagnosisBadge, linkedVisits = [],
 }: ScreeningRowProps) {
+  const [diagOpen, setDiagOpen] = useState(false);
   // Determine pill / missing-data state
   const screenState = screening && profile ? profile.screenings?.[screening.id] ?? {} : {};
   const cadenceApplies = !!screening
@@ -409,16 +437,23 @@ function ScreeningRow({
             </div>
           )}
 
-          {diagnosisBadge && <DiagnosisToggle />}
+          {diagnosisBadge && <DiagnosisToggleButton open={diagOpen} onToggle={() => setDiagOpen((o) => !o)} />}
 
           {needsLastTest && (
             <MissingDataAlert onSubmit={(yyyymm) => onSetUltimoTest!(yyyymm)} />
           )}
         </div>
 
-        {/* Reserved column */}
-        <PillSlot>{dueDate && <DuePill date={dueDate} />}</PillSlot>
+        {/* Reserved column — omitted entirely for diagnosis rows so expanded note can go full width */}
+        {!diagnosisBadge && <PillSlot>{dueDate && <DuePill date={dueDate} />}</PillSlot>}
       </div>
+
+      {/* Diagnosis expanded note — full width */}
+      {diagnosisBadge && diagOpen && (
+        <div style={{ marginTop: 8, padding: "10px 12px", background: "#FBF1DD", borderLeft: "3px solid #D9A93E", borderRadius: 8, fontFamily: "var(--font-sans)", fontSize: 13, color: "#7A5310", lineHeight: 1.4 }}>
+          Avendo una diagnosi in corso, non rientri nello screening preventivo: il percorso lo definisce il tuo specialista.
+        </div>
+      )}
 
       {/* Linked visits (inline "AGGIUNTE DA TE") */}
       {linkedVisits.length > 0 && (
@@ -443,13 +478,12 @@ function ScreeningRow({
 // Diagnosis badge (toggle)
 // ---------------------------------------------------------------------------
 
-function DiagnosisToggle() {
-  const [open, setOpen] = useState(false);
+function DiagnosisToggleButton({ open, onToggle }: { open: boolean; onToggle: () => void }) {
   return (
     <div style={{ marginTop: 8 }}>
       <button
         type="button"
-        onClick={() => setOpen((o) => !o)}
+        onClick={onToggle}
         aria-expanded={open}
         style={{
           display: "inline-flex",
@@ -477,11 +511,6 @@ function DiagnosisToggle() {
           style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform 180ms", flexShrink: 0 }}
         />
       </button>
-      {open && (
-        <div style={{ marginTop: 8, padding: "10px 10px", background: "#FBF1DD", borderLeft: "3px solid #D9A93E", borderRadius: 8, fontFamily: "var(--font-sans)", fontSize: 13, color: "#7A5310", lineHeight: 1.4 }}>
-          Avendo una diagnosi in corso, non rientri nello screening preventivo: il percorso lo definisce il tuo specialista.
-        </div>
-      )}
     </div>
   );
 }
@@ -585,7 +614,7 @@ function VisitInlineRow({ v }: { v: Visit }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontFamily: "var(--font-sans)", fontSize: 16, fontWeight: 700, color: "var(--teal-900)", lineHeight: 1.25, letterSpacing: "-0.01em" }}>
+        <div style={{ fontFamily: "var(--font-sans)", fontSize: 15, fontWeight: 700, color: "var(--teal-900)", lineHeight: 1.25, letterSpacing: "-0.01em" }}>
           {v.nome}
         </div>
         <div style={{ marginTop: 2, fontFamily: "var(--font-sans)", fontSize: 13.5, color: "var(--ink-500)" }}>
