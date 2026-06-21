@@ -387,11 +387,11 @@ function ScreeningRow({
 
   return (
     <div style={{ padding: "12px 4px", borderTop: "1px solid var(--line-100)" }}>
-      <div style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-        <span style={{ flexShrink: 0, width: 38, height: 38, borderRadius: "50%", background: iconBg, color: iconColor, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>{icon}</span>
+      <div style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+        <span style={{ flexShrink: 0, width: 36, height: 36, borderRadius: "50%", background: iconBg, color: iconColor, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>{icon}</span>
 
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontFamily: "var(--font-sans)", fontSize: 15, fontWeight: 600, color: "#04342C", letterSpacing: "-0.01em", lineHeight: 1.25, overflowWrap: "anywhere" }}>
+          <div style={{ fontFamily: "var(--font-sans)", fontSize: 15, fontWeight: 600, color: "#04342C", letterSpacing: "-0.01em", lineHeight: 1.25, whiteSpace: "normal", wordBreak: "normal" }}>
             {title}
           </div>
           {(badge || meta) && (
@@ -411,8 +411,7 @@ function ScreeningRow({
           )}
         </div>
 
-        {/* Reserved columns */}
-        <EditSlot />
+        {/* Reserved column */}
         <PillSlot>{dueDate && <DuePill date={dueDate} />}</PillSlot>
       </div>
 
@@ -460,14 +459,17 @@ function DiagnosisToggle() {
           fontFamily: "var(--font-sans)",
           fontSize: 13,
           fontWeight: 700,
+          whiteSpace: "nowrap",
+          width: "fit-content",
+          maxWidth: "100%",
         }}
       >
         <Stethoscope size={15} strokeWidth={2.2} />
-        Sei seguito da uno specialista
+        Seguito da specialista
         <ChevronDown
           size={15}
           strokeWidth={2.4}
-          style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform 180ms" }}
+          style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform 180ms", flexShrink: 0 }}
         />
       </button>
       {open && (
