@@ -769,7 +769,7 @@ function StepScreeningGenerico({
         <div style={{ marginTop: 20, paddingTop: 20, borderTop: "1px solid var(--line-100)", display: "flex", flexDirection: "column", gap: 20 }}>
           {showTipo && (
             <div>
-              <FieldLabel>Quale test hai fatto?</FieldLabel>
+              <FieldLabel>Quale hai fatto come ultimo test?</FieldLabel>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {withTipoOpts!.map(([k,l]) => <OptionButton key={k} compact selected={tipo === k} onClick={() => setTipo(k)}>{l}</OptionButton>)}
               </div>
