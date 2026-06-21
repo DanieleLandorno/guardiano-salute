@@ -114,7 +114,7 @@ function Inner() {
   }, {});
 
   const standaloneVisits = visits.filter((v) => !v.screening_id);
-  const totaleControlli = plan.length + racc.length;
+  const totaleControlli = plan.length + diagnosed.length + racc.length + buone.length;
 
   const scrollToVisit = (id: string) => {
     const el = scrollRef.current?.querySelector(`[data-visita-id="${id}"]`) as HTMLElement | null;
@@ -185,23 +185,28 @@ function Inner() {
                   linkedVisits={visitsByScreening[s.id] ?? []}
                 />
               ))}
-              {diagnosed.map((d) => (
-                <ScreeningRow
-                  key={d.id}
-                  icon={screeningIcon[d.id] ?? <Shield size={20} strokeWidth={2.2} />}
-                  iconBg="var(--teal-100)"
-                  iconColor="var(--teal-700)"
-                  title={d.nome}
-                  diagnosisBadge
-                  linkedVisits={visitsByScreening[d.id] ?? []}
-                />
-              ))}
-              {ssnAll.length === 0 && diagnosed.length === 0 && (
+              {ssnAll.length === 0 && (
                 <div style={{ padding: "16px 4px", fontSize: 14.5, color: "var(--ink-500)" }}>
                   Nessun programma SSN attivo per il tuo profilo al momento.
                 </div>
               )}
             </Card>
+
+            {diagnosed.length > 0 && (
+              <Card eyebrow="Sei seguito da uno specialista" subtitle="Screening con diagnosi in corso — il percorso lo definisce il tuo specialista">
+                {diagnosed.map((d) => (
+                  <ScreeningRow
+                    key={d.id}
+                    icon={screeningIcon[d.id] ?? <Shield size={20} strokeWidth={2.2} />}
+                    iconBg="var(--teal-100)"
+                    iconColor="var(--teal-700)"
+                    title={d.nome}
+                    diagnosisBadge
+                    linkedVisits={visitsByScreening[d.id] ?? []}
+                  />
+                ))}
+              </Card>
+            )}
 
             <Card eyebrow="Linee guida nazionali" subtitle="Raccomandati — parlane col tuo medico">
               {racc.map((r) => (
@@ -386,23 +391,23 @@ function ScreeningRow({
         <span style={{ flexShrink: 0, width: 38, height: 38, borderRadius: "50%", background: iconBg, color: iconColor, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>{icon}</span>
 
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
-            <div style={{ flex: 1, minWidth: 0, fontFamily: "var(--font-sans)", fontSize: 17, fontWeight: 700, color: "var(--teal-900)", letterSpacing: "-0.01em", lineHeight: 1.25 }}>
-              {title}
-            </div>
-            {badge && (
+          <div style={{ fontFamily: "var(--font-sans)", fontSize: 17, fontWeight: 700, color: "var(--teal-900)", letterSpacing: "-0.01em", lineHeight: 1.25, overflowWrap: "anywhere" }}>
+            {title}
+          </div>
+          {badge && (
+            <div style={{ marginTop: 6 }}>
               <span style={{
                 display: "inline-flex", alignItems: "center", gap: 5,
-                fontFamily: "var(--font-sans)", fontSize: 12.5, fontWeight: 700, padding: "4px 10px", borderRadius: 999, flexShrink: 0, whiteSpace: "nowrap",
+                fontFamily: "var(--font-sans)", fontSize: 12.5, fontWeight: 700, padding: "4px 10px", borderRadius: 999, whiteSpace: "nowrap",
                 background: badge.kind === "free" ? "var(--teal-100)" : "#FBF1DD",
                 color: badge.kind === "free" ? "var(--teal-700)" : "#97681A",
               }}>
                 {badge.label}
               </span>
-            )}
-          </div>
+            </div>
+          )}
           {meta && (
-            <div style={{ marginTop: 2, fontFamily: "var(--font-sans)", fontSize: 14, color: "var(--ink-500)" }}>{meta}</div>
+            <div style={{ marginTop: 4, fontFamily: "var(--font-sans)", fontSize: 14, color: "var(--ink-500)" }}>{meta}</div>
           )}
 
           {diagnosisBadge && <DiagnosisToggle />}
