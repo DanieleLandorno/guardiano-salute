@@ -243,13 +243,13 @@ function Inner() {
           </>
         )}
 
-        {/* Le tue visite — solo standalone (senza screening_id) */}
-        {standaloneVisits.length > 0 && (
-          <section style={{ marginTop: 18, marginBottom: 6, background: "var(--teal-100)", borderRadius: 18, padding: "16px 14px", boxShadow: "0 2px 8px rgba(4,52,44,0.06)" }}>
-            <div style={{ padding: "0 4px 10px" }}>
-              <div style={{ fontFamily: "var(--font-sans)", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--teal-700)" }}>Le tue visite</div>
-              <div style={{ fontFamily: "var(--font-sans)", fontSize: 14.5, color: "var(--ink-700)", marginTop: 2 }}>Visite che hai aggiunto</div>
-            </div>
+        {/* Le tue visite — solo standalone (senza screening_id); sempre visibile */}
+        <section style={{ marginTop: 18, marginBottom: 6, background: "var(--teal-100)", borderRadius: 18, padding: "16px 14px", boxShadow: "0 2px 8px rgba(4,52,44,0.06)" }}>
+          <div style={{ padding: "0 4px 10px" }}>
+            <div style={{ fontFamily: "var(--font-sans)", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--teal-700)" }}>Le tue visite</div>
+            <div style={{ fontFamily: "var(--font-sans)", fontSize: 14.5, color: "var(--ink-700)", marginTop: 2 }}>Visite che hai aggiunto</div>
+          </div>
+          {standaloneVisits.length > 0 ? (
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {standaloneVisits.map((v) => (
                 <div key={v.id} data-visita-id={v.id} style={{ background: "#fff", borderRadius: 14, padding: "12px 12px 12px 14px" }}>
@@ -257,8 +257,35 @@ function Inner() {
                 </div>
               ))}
             </div>
-          </section>
-        )}
+          ) : (
+            <div style={{ background: "#fff", borderRadius: 14, padding: "16px 14px", display: "flex", flexDirection: "column", gap: 12 }}>
+              <div style={{ fontFamily: "var(--font-sans)", fontSize: 14, color: "var(--ink-500)", lineHeight: 1.4 }}>
+                Non hai ancora aggiunto visite personali
+              </div>
+              <Link
+                to="/visita"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 6,
+                  alignSelf: "flex-start",
+                  padding: "10px 16px",
+                  borderRadius: 999,
+                  background: "var(--teal-500)",
+                  color: "#fff",
+                  textDecoration: "none",
+                  fontFamily: "var(--font-sans)",
+                  fontSize: 14.5,
+                  fontWeight: 700,
+                }}
+              >
+                <Plus size={16} strokeWidth={2.6} />
+                Aggiungi una visita
+              </Link>
+            </div>
+          )}
+        </section>
       </div>
 
       {/* FAB */}
