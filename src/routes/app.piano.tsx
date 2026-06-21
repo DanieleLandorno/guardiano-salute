@@ -86,7 +86,16 @@ function Inner() {
 
   const nazionali = plan.filter((p) => ["cervice_uterina", "mammella", "colon_retto"].includes(p.id));
   const regionali = plan.filter((p) => p.id === "prostata");
-  const ssnAll = [...nazionali, ...regionali];
+  const planSsn = [...nazionali, ...regionali];
+  const diagnosedIds = new Set(diagnosed.map((d) => d.id));
+  type SsnEntry = { key: string; id: string; nome: string; screening?: MatchedScreening; isDiagnosed: boolean };
+  const ssnAll: SsnEntry[] = [
+    ...planSsn.map<SsnEntry>((s) => ({ key: s.id, id: s.id, nome: s.nome, screening: s, isDiagnosed: diagnosedIds.has(s.id) })),
+    ...diagnosed
+      .filter((d) => !planSsn.some((s) => s.id === d.id))
+      .map<SsnEntry>((d) => ({ key: d.id, id: d.id, nome: d.nome, isDiagnosed: true })),
+  ];
+  const diagnosedExtra = diagnosed.filter((d) => !planSsn.some((s) => s.id === d.id)).length;
 
   const racc: { id: string; nome: string; meta?: string; icon: React.ReactNode; bg: string; color: string }[] = [];
   if (
