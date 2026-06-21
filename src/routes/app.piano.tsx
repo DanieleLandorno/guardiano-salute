@@ -460,14 +460,17 @@ function DiagnosisToggle() {
           fontFamily: "var(--font-sans)",
           fontSize: 13,
           fontWeight: 700,
+          whiteSpace: "nowrap",
+          width: "fit-content",
+          maxWidth: "100%",
         }}
       >
         <Stethoscope size={15} strokeWidth={2.2} />
-        Sei seguito da uno specialista
+        Seguito da specialista
         <ChevronDown
           size={15}
           strokeWidth={2.4}
-          style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform 180ms" }}
+          style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform 180ms", flexShrink: 0 }}
         />
       </button>
       {open && (
