@@ -16,6 +16,7 @@ import { Route as CompletatoRouteImport } from './routes/completato'
 import { Route as ComeFunzionaRouteImport } from './routes/come-funziona'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppPianoRouteImport } from './routes/app.piano'
+import { Route as AppHomeRouteImport } from './routes/app.home'
 
 const VisitaRoute = VisitaRouteImport.update({
   id: '/visita',
@@ -52,6 +53,11 @@ const AppPianoRoute = AppPianoRouteImport.update({
   path: '/app/piano',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppHomeRoute = AppHomeRouteImport.update({
+  id: '/app/home',
+  path: '/app/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -60,6 +66,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/questionario': typeof QuestionarioRoute
   '/visita': typeof VisitaRoute
+  '/app/home': typeof AppHomeRoute
   '/app/piano': typeof AppPianoRoute
 }
 export interface FileRoutesByTo {
@@ -69,6 +76,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/questionario': typeof QuestionarioRoute
   '/visita': typeof VisitaRoute
+  '/app/home': typeof AppHomeRoute
   '/app/piano': typeof AppPianoRoute
 }
 export interface FileRoutesById {
@@ -79,6 +87,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/questionario': typeof QuestionarioRoute
   '/visita': typeof VisitaRoute
+  '/app/home': typeof AppHomeRoute
   '/app/piano': typeof AppPianoRoute
 }
 export interface FileRouteTypes {
@@ -90,6 +99,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/questionario'
     | '/visita'
+    | '/app/home'
     | '/app/piano'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -99,6 +109,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/questionario'
     | '/visita'
+    | '/app/home'
     | '/app/piano'
   id:
     | '__root__'
@@ -108,6 +119,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/questionario'
     | '/visita'
+    | '/app/home'
     | '/app/piano'
   fileRoutesById: FileRoutesById
 }
@@ -118,6 +130,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   QuestionarioRoute: typeof QuestionarioRoute
   VisitaRoute: typeof VisitaRoute
+  AppHomeRoute: typeof AppHomeRoute
   AppPianoRoute: typeof AppPianoRoute
 }
 
@@ -172,6 +185,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPianoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/home': {
+      id: '/app/home'
+      path: '/app/home'
+      fullPath: '/app/home'
+      preLoaderRoute: typeof AppHomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -182,18 +202,9 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   QuestionarioRoute: QuestionarioRoute,
   VisitaRoute: VisitaRoute,
+  AppHomeRoute: AppHomeRoute,
   AppPianoRoute: AppPianoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

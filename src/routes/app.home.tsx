@@ -63,7 +63,7 @@ function Inner() {
   const next = plan[0];
 
   const screenState = next ? profile.screenings?.[next.id] ?? {} : {};
-  const prenotato = !!screenState.prenotato;
+  const prenotato = !!(screenState as { prenotato?: boolean }).prenotato;
   const screeningDaPrenotare = !!next && !prenotato;
 
   // Date pill (mese/anno) when we have ultimo_test_data + cadenza
