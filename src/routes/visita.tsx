@@ -72,11 +72,50 @@ function Inner() {
   const [data, setData] = useState<string>(editing?.data ?? "");
   const [confirmDelete, setConfirmDelete] = useState(false);
 
-  // Available screenings from user's plan
-  const plan = useMemo(() => {
+  // Available screenings, grouped for the selector
+  const planGroups = useMemo(() => {
     const ready = !!profile.sesso && !!profile.eta;
-    return ready ? computePlan(profile as UserProfile) : [];
+    const plan = ready ? computePlan(profile as UserProfile) : [];
+
+    const nazionali = plan.filter((p) => ["cervice_uterina", "mammella", "colon_retto"].includes(p.id));
+    const regionali = plan.filter((p) => p.id === "prostata");
+    const ssn = [...nazionali, ...regionali].map((p) => ({ id: p.id, nome: p.nome }));
+
+    const organNames: Record<string, string> = {
+      cervice_uterina: "Screening della cervice uterina",
+      mammella: "Screening mammella",
+      prostata: "Screening prostata",
+      colon_retto: "Screening colon-retto",
+    };
+    const diagnosed = (profile.diagnosi_oncologica ?? [])
+      .filter((id) => id in organNames)
+      .map((id) => ({ id, nome: organNames[id] }));
+
+    const racc: { id: string; nome: string }[] = [];
+    if (
+      profile.familiarita_cardio === "si" ||
+      (profile.comorbidita ?? []).includes("ipertensione") ||
+      (profile.comorbidita ?? []).includes("colesterolo")
+    ) {
+      racc.push({ id: "cardiovascolare", nome: "Cardiovascolare" });
+    } else {
+      racc.push({ id: "cardiovascolare", nome: "Cardiovascolare" });
+    }
+    if (profile.familiarita_diabete === "si" || (profile.comorbidita ?? []).includes("diabete") || (profile.eta ?? 0) >= 45) {
+      racc.push({ id: "diabete", nome: "Diabete" });
+    }
+
+    const buone = [
+      { id: "dermatologia", nome: "Dermatologia" },
+      { id: "oculistica", nome: "Oculistica" },
+      { id: "controlli_periodici", nome: "Controlli periodici" },
+    ];
+
+    return { ssn, racc, buone, diagnosed };
   }, [profile]);
+
+  const hasAnyScreening =
+    planGroups.ssn.length + planGroups.racc.length + planGroups.buone.length + planGroups.diagnosed.length > 0;
 
   const valid =
     !!tipologia &&
