@@ -240,23 +240,24 @@ function Inner() {
               ))}
             </Card>
 
-            {/* Le tue visite — solo standalone (senza screening_id) */}
-            {standaloneVisits.length > 0 && (
-              <section style={{ marginTop: 18, marginBottom: 6, background: "var(--teal-100)", borderRadius: 18, padding: "16px 14px", boxShadow: "0 2px 8px rgba(4,52,44,0.06)" }}>
-                <div style={{ padding: "0 4px 10px" }}>
-                  <div style={{ fontFamily: "var(--font-sans)", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--teal-700)" }}>Le tue visite</div>
-                  <div style={{ fontFamily: "var(--font-sans)", fontSize: 14.5, color: "var(--ink-700)", marginTop: 2 }}>Visite che hai aggiunto</div>
-                </div>
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  {standaloneVisits.map((v) => (
-                    <div key={v.id} data-visita-id={v.id} style={{ background: "#fff", borderRadius: 14, padding: "12px 12px 12px 14px" }}>
-                      <VisitInlineRow v={v} />
-                    </div>
-                  ))}
-                </div>
-              </section>
-            )}
           </>
+        )}
+
+        {/* Le tue visite — solo standalone (senza screening_id) */}
+        {standaloneVisits.length > 0 && (
+          <section style={{ marginTop: 18, marginBottom: 6, background: "var(--teal-100)", borderRadius: 18, padding: "16px 14px", boxShadow: "0 2px 8px rgba(4,52,44,0.06)" }}>
+            <div style={{ padding: "0 4px 10px" }}>
+              <div style={{ fontFamily: "var(--font-sans)", fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--teal-700)" }}>Le tue visite</div>
+              <div style={{ fontFamily: "var(--font-sans)", fontSize: 14.5, color: "var(--ink-700)", marginTop: 2 }}>Visite che hai aggiunto</div>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {standaloneVisits.map((v) => (
+                <div key={v.id} data-visita-id={v.id} style={{ background: "#fff", borderRadius: 14, padding: "12px 12px 12px 14px" }}>
+                  <VisitInlineRow v={v} />
+                </div>
+              ))}
+            </div>
+          </section>
         )}
       </div>
 
