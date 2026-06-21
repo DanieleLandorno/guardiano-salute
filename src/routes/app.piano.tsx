@@ -150,7 +150,7 @@ function Inner() {
 
   return (
     <>
-      <div ref={scrollRef} style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "8px 18px 200px" }}>
+      <div ref={scrollRef} style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: "8px 18px 96px" }}>
         {/* Header */}
         <div style={{ padding: "8px 2px 14px" }}>
           <div style={{ fontFamily: "var(--font-sans)", fontSize: 12, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--teal-700)" }}>
@@ -450,7 +450,7 @@ function ScreeningRow({
 
       {/* Diagnosis expanded note — full width */}
       {diagnosisBadge && diagOpen && (
-        <div style={{ marginTop: 8, padding: "10px 12px", background: "#FBF1DD", borderLeft: "3px solid #D9A93E", borderRadius: 8, fontFamily: "var(--font-sans)", fontSize: 13, color: "#7A5310", lineHeight: 1.4 }}>
+        <div style={{ marginTop: 8, marginLeft: 46, padding: "10px 12px", background: "#FBF1DD", borderLeft: "3px solid #D9A93E", borderRadius: 8, fontFamily: "var(--font-sans)", fontSize: 13, color: "#7A5310", lineHeight: 1.4 }}>
           Avendo una diagnosi in corso, non rientri nello screening preventivo: il percorso lo definisce il tuo specialista.
         </div>
       )}
