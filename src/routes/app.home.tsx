@@ -101,8 +101,7 @@ function Inner() {
           <HeroScreening
             stato={screeningDaPrenotare ? "A" : "B"}
             nome={next?.nome ?? null}
-            mese={mese}
-            anno={anno}
+            dataEstesa={dataEstesa}
           />
 
           <RefertoCard />
