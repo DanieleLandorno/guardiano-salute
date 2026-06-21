@@ -166,13 +166,11 @@ function QuestionarioCard({
 function HeroScreening({
   stato,
   nome,
-  mese,
-  anno,
+  dataEstesa,
 }: {
   stato: "A" | "B";
   nome: string | null;
-  mese: string | null;
-  anno: string | null;
+  dataEstesa: string | null;
 }) {
   return (
     <section className="rounded-3xl p-6" style={{ background: "#04342C" }}>
@@ -204,7 +202,7 @@ function HeroScreening({
             {nome ?? "Nessuno screening attivo"}
           </h2>
           <p className="mt-1 text-[14.5px]" style={{ color: "#9FE1CB" }}>
-            {mese ? `Consigliata entro ${mese}` : "Consigliata a breve"}
+            {dataEstesa ? `Da fare entro ${dataEstesa}` : "Da fare a breve"}
           </p>
           <button
             type="button"
@@ -233,7 +231,7 @@ function HeroScreening({
               </div>
               <div className="mt-2 text-[15px] text-white">
                 {nome}
-                {mese && anno ? ` · ${mese} ${anno}` : ""}
+                {dataEstesa ? ` · ${dataEstesa}` : ""}
               </div>
             </div>
           )}
