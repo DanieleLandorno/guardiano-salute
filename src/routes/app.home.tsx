@@ -154,8 +154,8 @@ function QuestionarioCard({
 
       <Link
         to="/questionario"
-        className="mt-5 flex w-full items-center justify-center rounded-2xl py-3 text-[15px] font-semibold text-white"
-        style={{ background: "#E24B4A" }}
+        className="mt-5 flex w-full items-center justify-center rounded-2xl py-3 text-[15px] font-semibold !text-white"
+        style={{ background: "#E24B4A", color: "#FFFFFF" }}
       >
         Riprendi da dove eri
       </Link>
