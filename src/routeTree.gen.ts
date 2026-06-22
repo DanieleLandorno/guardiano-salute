@@ -15,6 +15,7 @@ import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as CompletatoRouteImport } from './routes/completato'
 import { Route as ComeFunzionaRouteImport } from './routes/come-funziona'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppPrenotazioniRouteImport } from './routes/app.prenotazioni'
 import { Route as AppPianoRouteImport } from './routes/app.piano'
 import { Route as AppHomeRouteImport } from './routes/app.home'
 
@@ -48,6 +49,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppPrenotazioniRoute = AppPrenotazioniRouteImport.update({
+  id: '/app/prenotazioni',
+  path: '/app/prenotazioni',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppPianoRoute = AppPianoRouteImport.update({
   id: '/app/piano',
   path: '/app/piano',
@@ -68,6 +74,7 @@ export interface FileRoutesByFullPath {
   '/visita': typeof VisitaRoute
   '/app/home': typeof AppHomeRoute
   '/app/piano': typeof AppPianoRoute
+  '/app/prenotazioni': typeof AppPrenotazioniRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByTo {
   '/visita': typeof VisitaRoute
   '/app/home': typeof AppHomeRoute
   '/app/piano': typeof AppPianoRoute
+  '/app/prenotazioni': typeof AppPrenotazioniRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -89,6 +97,7 @@ export interface FileRoutesById {
   '/visita': typeof VisitaRoute
   '/app/home': typeof AppHomeRoute
   '/app/piano': typeof AppPianoRoute
+  '/app/prenotazioni': typeof AppPrenotazioniRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -101,6 +110,7 @@ export interface FileRouteTypes {
     | '/visita'
     | '/app/home'
     | '/app/piano'
+    | '/app/prenotazioni'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -111,6 +121,7 @@ export interface FileRouteTypes {
     | '/visita'
     | '/app/home'
     | '/app/piano'
+    | '/app/prenotazioni'
   id:
     | '__root__'
     | '/'
@@ -121,6 +132,7 @@ export interface FileRouteTypes {
     | '/visita'
     | '/app/home'
     | '/app/piano'
+    | '/app/prenotazioni'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -132,6 +144,7 @@ export interface RootRouteChildren {
   VisitaRoute: typeof VisitaRoute
   AppHomeRoute: typeof AppHomeRoute
   AppPianoRoute: typeof AppPianoRoute
+  AppPrenotazioniRoute: typeof AppPrenotazioniRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -178,6 +191,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/prenotazioni': {
+      id: '/app/prenotazioni'
+      path: '/app/prenotazioni'
+      fullPath: '/app/prenotazioni'
+      preLoaderRoute: typeof AppPrenotazioniRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/piano': {
       id: '/app/piano'
       path: '/app/piano'
@@ -204,6 +224,7 @@ const rootRouteChildren: RootRouteChildren = {
   VisitaRoute: VisitaRoute,
   AppHomeRoute: AppHomeRoute,
   AppPianoRoute: AppPianoRoute,
+  AppPrenotazioniRoute: AppPrenotazioniRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

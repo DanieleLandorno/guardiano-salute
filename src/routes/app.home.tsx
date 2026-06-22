@@ -286,7 +286,7 @@ function BottomNav() {
         label="Piano"
         to="/app/piano"
       />
-      <NavTab icon={<Calendar size={22} strokeWidth={1.9} />} label="Prenotazioni" />
+      <NavTab icon={<Calendar size={22} strokeWidth={1.9} />} label="Prenotazioni" to="/app/prenotazioni" />
       <NavTab icon={<FileText size={22} strokeWidth={1.9} />} label="Referti" />
     </nav>
   );

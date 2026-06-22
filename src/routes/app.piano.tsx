@@ -658,7 +658,7 @@ function BottomNav() {
     >
       <NavTab icon={<HomeIcon size={22} strokeWidth={1.9} />} label="Home" to="/app/home" />
       <NavTab icon={<ClipboardCheck size={22} strokeWidth={2.2} />} label="Piano" active />
-      <NavTab icon={<CalendarIcon size={22} strokeWidth={1.9} />} label="Prenotazioni" />
+      <NavTab icon={<CalendarIcon size={22} strokeWidth={1.9} />} label="Prenotazioni" to="/app/prenotazioni" />
       <NavTab icon={<FileText size={22} strokeWidth={1.9} />} label="Referti" />
     </nav>
   );
