@@ -192,109 +192,136 @@ function Inner() {
         </section>
 
         {/* Sezione: Promemoria dal medico */}
-        <section style={{ marginTop: 28 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: "50%",
-                background: TEAL_LIGHT,
-                color: TEAL_DARK,
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <ClipboardList size={18} strokeWidth={2.2} />
-            </span>
-            <h2
-              style={{
-                margin: 0,
-                fontFamily: "var(--font-sans)",
-                fontSize: 18,
-                fontWeight: 700,
-                color: TEAL_900,
-                letterSpacing: "-0.01em",
-              }}
-            >
-              Promemoria dal medico
-            </h2>
-          </div>
-          <p style={{ margin: "6px 0 14px", fontFamily: "var(--font-sans)", fontSize: 14, color: INK_500, lineHeight: 1.45 }}>
-            Controlli da concordare con il tuo medico di base. Non si prenotano qui.
-          </p>
-
-          <div
-            style={{
-              background: "#fff",
-              border: `1px solid ${LINE}`,
-              borderRadius: 16,
-              overflow: "hidden",
-            }}
-          >
-            {promemoria.map((p, i) => (
-              <div
-                key={p.id}
+        {promemoria.length > 0 && (
+          <section style={{ marginTop: 28 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span
                 style={{
-                  display: "flex",
+                  width: 32,
+                  height: 32,
+                  borderRadius: "50%",
+                  background: TEAL_LIGHT,
+                  color: TEAL_DARK,
+                  display: "inline-flex",
                   alignItems: "center",
-                  gap: 12,
-                  padding: "12px 12px 12px 0",
-                  borderTop: i === 0 ? "none" : `1px solid ${LINE}`,
-                  borderLeft: `3px solid ${TEAL}`,
-                  paddingLeft: 12,
+                  justifyContent: "center",
                 }}
               >
-                <span
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: "50%",
-                    background: p.bg,
-                    color: p.color,
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                  }}
-                >
-                  {p.icon}
-                </span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontFamily: "var(--font-sans)", fontSize: 15, fontWeight: 700, color: TEAL_900, lineHeight: 1.25 }}>
-                    {p.nome}
+                <ClipboardList size={18} strokeWidth={2.2} />
+              </span>
+              <h2
+                style={{
+                  margin: 0,
+                  fontFamily: "var(--font-sans)",
+                  fontSize: 18,
+                  fontWeight: 700,
+                  color: TEAL_900,
+                  letterSpacing: "-0.01em",
+                }}
+              >
+                Promemoria dal medico
+              </h2>
+            </div>
+            <p style={{ margin: "6px 0 14px", fontFamily: "var(--font-sans)", fontSize: 14, color: INK_500, lineHeight: 1.45 }}>
+              Da gestire con il tuo medico di base. La visita relativa la registri con il pulsante "+".
+            </p>
+
+            <div
+              style={{
+                background: "#fff",
+                border: `1px solid ${LINE}`,
+                borderRadius: 16,
+                overflow: "hidden",
+              }}
+            >
+              {promemoria.map((p, i) => {
+                const subtitle =
+                  p.azione === "richiedi_colonscopia"
+                    ? "Esito positivo · contatta il medico"
+                    : "Da gestire col tuo medico";
+                return (
+                  <div
+                    key={p.id}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 12,
+                      padding: "12px 12px",
+                      borderTop: i === 0 ? "none" : `1px solid ${LINE}`,
+                      borderLeft: `3px solid ${TEAL}`,
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: "50%",
+                        background: TEAL_LIGHT,
+                        color: TEAL_DARK,
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                      }}
+                    >
+                      <Stethoscope size={18} strokeWidth={2.2} />
+                    </span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontFamily: "var(--font-sans)", fontSize: 15, fontWeight: 700, color: TEAL_900, lineHeight: 1.25 }}>
+                        {p.nome}
+                      </div>
+                      <div style={{ fontFamily: "var(--font-sans)", fontSize: 13, color: INK_500, marginTop: 2 }}>
+                        {subtitle}
+                      </div>
+                    </div>
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 4,
+                        padding: "4px 10px",
+                        borderRadius: 999,
+                        background: TEAL_LIGHT,
+                        color: TEAL_900,
+                        fontFamily: "var(--font-sans)",
+                        fontSize: 11.5,
+                        fontWeight: 700,
+                        whiteSpace: "nowrap",
+                        flexShrink: 0,
+                      }}
+                    >
+                      Seguito da specialista
+                    </span>
                   </div>
-                  <div style={{ fontFamily: "var(--font-sans)", fontSize: 13, color: INK_500, marginTop: 2 }}>
-                    Parlane alla prossima visita
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6,
-                    padding: "8px 12px",
-                    borderRadius: 999,
-                    background: "#fff",
-                    color: TEAL_DARK,
-                    border: `1.5px solid ${TEAL}`,
-                    cursor: "pointer",
-                    fontFamily: "var(--font-sans)",
-                    fontSize: 13,
-                    fontWeight: 700,
-                    flexShrink: 0,
-                  }}
-                >
-                  <Bookmark size={14} strokeWidth={2.4} />
-                  Salva
-                </button>
-              </div>
-            ))}
-          </div>
-        </section>
+                );
+              })}
+            </div>
+          </section>
+        )}
       </div>
+
+      {/* FAB (clone of /app/piano) */}
+      <Link
+        to="/visita"
+        aria-label="Aggiungi una visita"
+        style={{
+          position: "absolute",
+          right: 18,
+          bottom: 96,
+          width: 60,
+          height: 60,
+          borderRadius: "50%",
+          background: "var(--teal-500)",
+          color: "#fff",
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          boxShadow: "0 12px 24px rgba(4,52,44,0.22)",
+          zIndex: 20,
+        }}
+      >
+        <Plus size={28} strokeWidth={2.6} />
+      </Link>
 
       <BottomNav />
 
