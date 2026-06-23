@@ -3,8 +3,9 @@ import { useEffect, useState } from "react";
 import { PhoneFrame } from "@/components/checkit/PhoneFrame";
 import { ProfileProvider, useProfile } from "@/lib/checkit/store";
 import { VisitsProvider } from "@/lib/checkit/visits";
+import { PrenotazioniProvider, usePrenotazioni } from "@/lib/checkit/prenotazioni";
 import { computePlan, type UserProfile } from "@/lib/checkit/rules";
-import { nextDateFromYearMonth } from "@/lib/checkit/schedule";
+import { nextDateFromYearMonth, contaDaPrenotare } from "@/lib/checkit/schedule";
 import { Progress } from "@/components/ui/progress";
 import {
   Clock,
