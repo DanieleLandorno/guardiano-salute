@@ -3,8 +3,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { PhoneFrame } from "@/components/checkit/PhoneFrame";
 import { ProfileProvider, useProfile } from "@/lib/checkit/store";
 import { VisitsProvider } from "@/lib/checkit/visits";
-import { computePlan, type MatchedScreening, type UserProfile } from "@/lib/checkit/rules";
+import { type MatchedScreening, type UserProfile } from "@/lib/checkit/rules";
 import { usePrenotazioni, type StatoPrenotazione } from "@/lib/checkit/prenotazioni";
+import {
+  bookableSsnScreenings,
+  contaDaPrenotare,
+  promemoriaMedicoScreenings,
+} from "@/lib/checkit/schedule";
 import {
   Home as HomeIcon,
   ClipboardCheck,
@@ -14,13 +19,9 @@ import {
   CheckCircle2,
   CalendarCheck,
   ClipboardList,
-  Bookmark,
   X,
-  Heart,
-  Droplet,
-  Sun,
-  Eye,
   Stethoscope,
+  Plus,
 } from "lucide-react";
 
 export const Route = createFileRoute("/app/prenotazioni")({
