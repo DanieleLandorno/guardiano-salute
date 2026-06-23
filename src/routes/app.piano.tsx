@@ -103,18 +103,18 @@ function Inner() {
     (profile.comorbidita ?? []).includes("ipertensione") ||
     (profile.comorbidita ?? []).includes("colesterolo")
   ) {
-    racc.push({ id: "cardiovascolare", nome: "Cardiovascolare", meta: "Pressione e profilo lipidico", icon: <Heart size={20} strokeWidth={2.2} />, bg: "#FBE6E6", color: "#C0392B" });
+    racc.push({ id: "cardiovascolare", nome: "Cardiovascolare", meta: "Pressione e profilo lipidico", icon: <Heart size={20} strokeWidth={2.2} />, bg: "#E1F5EE", color: "#0F6E56" });
   } else {
-    racc.push({ id: "cardiovascolare", nome: "Cardiovascolare", icon: <Heart size={20} strokeWidth={2.2} />, bg: "#FBE6E6", color: "#C0392B" });
+    racc.push({ id: "cardiovascolare", nome: "Cardiovascolare", icon: <Heart size={20} strokeWidth={2.2} />, bg: "#E1F5EE", color: "#0F6E56" });
   }
   if (profile.familiarita_diabete === "si" || (profile.comorbidita ?? []).includes("diabete") || (profile.eta ?? 0) >= 45) {
-    racc.push({ id: "diabete", nome: "Diabete", meta: "Glicemia o HbA1c", icon: <Droplet size={20} strokeWidth={2.2} />, bg: "#E6EEFB", color: "#2C6E84" });
+    racc.push({ id: "diabete", nome: "Diabete", meta: "Glicemia o HbA1c", icon: <Droplet size={20} strokeWidth={2.2} />, bg: "#EAF3F0", color: "#0F6E56" });
   }
 
   const buone = [
-    { id: "dermatologia", nome: "Dermatologia", meta: profile.pelle === "chiara" || profile.nei === "molti" ? "Consigliato controllo annuale" : undefined, icon: <Sun size={20} strokeWidth={2.2} />, bg: "#FBF1DD", color: "#97681A" },
-    { id: "oculistica", nome: "Oculistica", icon: <Eye size={20} strokeWidth={2.2} />, bg: "#E6F4F0", color: "var(--teal-700)" },
-    { id: "controlli_periodici", nome: "Controlli periodici", meta: "dal medico di base", icon: <Stethoscope size={20} strokeWidth={2.2} />, bg: "#EEF0EC", color: "var(--ink-700)" },
+    { id: "dermatologia", nome: "Dermatologia", meta: profile.pelle === "chiara" || profile.nei === "molti" ? "Consigliato controllo annuale" : undefined, icon: <Sun size={20} strokeWidth={2.2} />, bg: "#EAF3F0", color: "#0F6E56" },
+    { id: "oculistica", nome: "Oculistica", icon: <Eye size={20} strokeWidth={2.2} />, bg: "#EAF3F0", color: "#0F6E56" },
+    { id: "controlli_periodici", nome: "Controlli periodici", meta: "dal medico di base", icon: <Stethoscope size={20} strokeWidth={2.2} />, bg: "#EAF3F0", color: "#0F6E56" },
   ];
 
   const visitsByScreening = visits.reduce<Record<string, Visit[]>>((acc, v) => {
