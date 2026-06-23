@@ -29,9 +29,11 @@ function AppHomeRoute() {
   return (
     <ProfileProvider>
       <VisitsProvider>
-        <PhoneFrame>
-          <Inner />
-        </PhoneFrame>
+        <PrenotazioniProvider>
+          <PhoneFrame>
+            <Inner />
+          </PhoneFrame>
+        </PrenotazioniProvider>
       </VisitsProvider>
     </ProfileProvider>
   );
