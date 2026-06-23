@@ -57,6 +57,7 @@ function useSezioniCompletate(): number {
 
 function Inner() {
   const { profile } = useProfile();
+  const { prenotazioni } = usePrenotazioni();
   const sezioniCompletate = useSezioniCompletate();
   const profiloCompleto = sezioniCompletate === 5;
   const percentuale = Math.round((sezioniCompletate / 5) * 100);
@@ -65,11 +66,12 @@ function Inner() {
   const plan = ready ? computePlan(profile as UserProfile) : [];
   const next = plan[0];
 
-  const screenState = next ? profile.screenings?.[next.id] ?? {} : {};
-  const prenotato = !!(screenState as { prenotato?: boolean }).prenotato;
-  const screeningDaPrenotare = !!next && !prenotato;
+  // Counter unico, condiviso con /app/prenotazioni
+  const daPrenotare = ready ? contaDaPrenotare(profile as UserProfile, prenotazioni) : 0;
+  const screeningDaPrenotare = daPrenotare > 0;
 
   // Extended month/year (lowercase) for the next screening subtitle
+  const screenState = next ? profile.screenings?.[next.id] ?? {} : {};
   let dataEstesa: string | null = null;
   if (next?.cadenza_mesi && screenState.ultimo_test_data && !screenState.data_da_completare) {
     const d = nextDateFromYearMonth(screenState.ultimo_test_data, next.cadenza_mesi);
