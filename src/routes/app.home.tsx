@@ -3,8 +3,9 @@ import { useEffect, useState } from "react";
 import { PhoneFrame } from "@/components/checkit/PhoneFrame";
 import { ProfileProvider, useProfile } from "@/lib/checkit/store";
 import { VisitsProvider } from "@/lib/checkit/visits";
+import { PrenotazioniProvider, usePrenotazioni } from "@/lib/checkit/prenotazioni";
 import { computePlan, type UserProfile } from "@/lib/checkit/rules";
-import { nextDateFromYearMonth } from "@/lib/checkit/schedule";
+import { nextDateFromYearMonth, contaDaPrenotare } from "@/lib/checkit/schedule";
 import { Progress } from "@/components/ui/progress";
 import {
   Clock,
@@ -28,9 +29,11 @@ function AppHomeRoute() {
   return (
     <ProfileProvider>
       <VisitsProvider>
-        <PhoneFrame>
-          <Inner />
-        </PhoneFrame>
+        <PrenotazioniProvider>
+          <PhoneFrame>
+            <Inner />
+          </PhoneFrame>
+        </PrenotazioniProvider>
       </VisitsProvider>
     </ProfileProvider>
   );
@@ -54,6 +57,7 @@ function useSezioniCompletate(): number {
 
 function Inner() {
   const { profile } = useProfile();
+  const { prenotazioni } = usePrenotazioni();
   const sezioniCompletate = useSezioniCompletate();
   const profiloCompleto = sezioniCompletate === 5;
   const percentuale = Math.round((sezioniCompletate / 5) * 100);
@@ -62,11 +66,12 @@ function Inner() {
   const plan = ready ? computePlan(profile as UserProfile) : [];
   const next = plan[0];
 
-  const screenState = next ? profile.screenings?.[next.id] ?? {} : {};
-  const prenotato = !!(screenState as { prenotato?: boolean }).prenotato;
-  const screeningDaPrenotare = !!next && !prenotato;
+  // Counter unico, condiviso con /app/prenotazioni
+  const daPrenotare = ready ? contaDaPrenotare(profile as UserProfile, prenotazioni) : 0;
+  const screeningDaPrenotare = daPrenotare > 0;
 
   // Extended month/year (lowercase) for the next screening subtitle
+  const screenState = next ? profile.screenings?.[next.id] ?? {} : {};
   let dataEstesa: string | null = null;
   if (next?.cadenza_mesi && screenState.ultimo_test_data && !screenState.data_da_completare) {
     const d = nextDateFromYearMonth(screenState.ultimo_test_data, next.cadenza_mesi);

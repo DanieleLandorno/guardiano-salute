@@ -3,8 +3,13 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { PhoneFrame } from "@/components/checkit/PhoneFrame";
 import { ProfileProvider, useProfile } from "@/lib/checkit/store";
 import { VisitsProvider } from "@/lib/checkit/visits";
-import { computePlan, type MatchedScreening, type UserProfile } from "@/lib/checkit/rules";
+import { type MatchedScreening, type UserProfile } from "@/lib/checkit/rules";
 import { usePrenotazioni, type StatoPrenotazione } from "@/lib/checkit/prenotazioni";
+import {
+  bookableSsnScreenings,
+  contaDaPrenotare,
+  promemoriaMedicoScreenings,
+} from "@/lib/checkit/schedule";
 import {
   Home as HomeIcon,
   ClipboardCheck,
@@ -14,13 +19,9 @@ import {
   CheckCircle2,
   CalendarCheck,
   ClipboardList,
-  Bookmark,
   X,
-  Heart,
-  Droplet,
-  Sun,
-  Eye,
   Stethoscope,
+  Plus,
 } from "lucide-react";
 
 export const Route = createFileRoute("/app/prenotazioni")({
@@ -58,34 +59,13 @@ const INK_700 = "#2E2E2A";
 
 function Inner() {
   const { profile } = useProfile();
-  const { getPrenotazione, setPrenotazione } = usePrenotazioni();
+  const { prenotazioni, getPrenotazione, setPrenotazione } = usePrenotazioni();
 
   const ready = !!profile.sesso && !!profile.eta;
-  const plan = ready ? computePlan(profile as UserProfile) : [];
 
-  // Same SSN logic as app.piano.tsx
-  const diagnosed = new Set(profile.diagnosi_oncologica ?? []);
-  const nazionali = plan.filter((p) =>
-    ["cervice_uterina", "mammella", "colon_retto"].includes(p.id),
-  );
-  const regionali = plan.filter((p) => p.id === "prostata");
-  const ssn = [...nazionali, ...regionali].filter((s) => !diagnosed.has(s.id));
-
-  // Promemoria dal medico (Tier 3 — same source as app.piano.tsx)
-  const promemoria: { id: string; nome: string; icon: ReactNode; bg: string; color: string }[] = [];
-  if (
-    profile.familiarita_cardio === "si" ||
-    (profile.comorbidita ?? []).includes("ipertensione") ||
-    (profile.comorbidita ?? []).includes("colesterolo")
-  ) {
-    promemoria.push({ id: "cardiovascolare", nome: "Cardiovascolare", icon: <Heart size={18} strokeWidth={2.2} />, bg: "#FBE6E6", color: "#C0392B" });
-  }
-  if (profile.familiarita_diabete === "si" || (profile.comorbidita ?? []).includes("diabete") || (profile.eta ?? 0) >= 45) {
-    promemoria.push({ id: "diabete", nome: "Diabete", icon: <Droplet size={18} strokeWidth={2.2} />, bg: "#E6EEFB", color: "#2C6E84" });
-  }
-  promemoria.push({ id: "dermatologia", nome: "Dermatologia", icon: <Sun size={18} strokeWidth={2.2} />, bg: "#FBF1DD", color: "#97681A" });
-  promemoria.push({ id: "oculistica", nome: "Oculistica", icon: <Eye size={18} strokeWidth={2.2} />, bg: TEAL_LIGHT, color: TEAL_DARK });
-  promemoria.push({ id: "controlli_periodici", nome: "Controlli periodici", icon: <Stethoscope size={18} strokeWidth={2.2} />, bg: "#EEF0EC", color: INK_700 });
+  // Source of truth: lo stesso helper usato dalla Home, basato su computePlan.
+  const ssn = ready ? bookableSsnScreenings(profile as UserProfile) : [];
+  const promemoria = ready ? promemoriaMedicoScreenings(profile as UserProfile) : [];
 
   // Order: in_agenda → da_prenotare → eseguito
   type Entry = { s: MatchedScreening; state: StatoPrenotazione };
@@ -94,7 +74,7 @@ function Inner() {
     e.state.stato === "in_agenda" ? 0 : e.state.stato === "da_prenotare" ? 1 : 2;
   entries.sort((a, b) => order(a) - order(b));
 
-  const countDaPrenotare = entries.filter((e) => e.state.stato === "da_prenotare").length;
+  const countDaPrenotare = ready ? contaDaPrenotare(profile as UserProfile, prenotazioni) : 0;
   const eseguiti = entries.filter((e) => e.state.stato === "eseguito");
   const nonEseguiti = entries.filter((e) => e.state.stato !== "eseguito");
 
@@ -212,109 +192,136 @@ function Inner() {
         </section>
 
         {/* Sezione: Promemoria dal medico */}
-        <section style={{ marginTop: 28 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: "50%",
-                background: TEAL_LIGHT,
-                color: TEAL_DARK,
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <ClipboardList size={18} strokeWidth={2.2} />
-            </span>
-            <h2
-              style={{
-                margin: 0,
-                fontFamily: "var(--font-sans)",
-                fontSize: 18,
-                fontWeight: 700,
-                color: TEAL_900,
-                letterSpacing: "-0.01em",
-              }}
-            >
-              Promemoria dal medico
-            </h2>
-          </div>
-          <p style={{ margin: "6px 0 14px", fontFamily: "var(--font-sans)", fontSize: 14, color: INK_500, lineHeight: 1.45 }}>
-            Controlli da concordare con il tuo medico di base. Non si prenotano qui.
-          </p>
-
-          <div
-            style={{
-              background: "#fff",
-              border: `1px solid ${LINE}`,
-              borderRadius: 16,
-              overflow: "hidden",
-            }}
-          >
-            {promemoria.map((p, i) => (
-              <div
-                key={p.id}
+        {promemoria.length > 0 && (
+          <section style={{ marginTop: 28 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <span
                 style={{
-                  display: "flex",
+                  width: 32,
+                  height: 32,
+                  borderRadius: "50%",
+                  background: TEAL_LIGHT,
+                  color: TEAL_DARK,
+                  display: "inline-flex",
                   alignItems: "center",
-                  gap: 12,
-                  padding: "12px 12px 12px 0",
-                  borderTop: i === 0 ? "none" : `1px solid ${LINE}`,
-                  borderLeft: `3px solid ${TEAL}`,
-                  paddingLeft: 12,
+                  justifyContent: "center",
                 }}
               >
-                <span
-                  style={{
-                    width: 32,
-                    height: 32,
-                    borderRadius: "50%",
-                    background: p.bg,
-                    color: p.color,
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                  }}
-                >
-                  {p.icon}
-                </span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontFamily: "var(--font-sans)", fontSize: 15, fontWeight: 700, color: TEAL_900, lineHeight: 1.25 }}>
-                    {p.nome}
+                <ClipboardList size={18} strokeWidth={2.2} />
+              </span>
+              <h2
+                style={{
+                  margin: 0,
+                  fontFamily: "var(--font-sans)",
+                  fontSize: 18,
+                  fontWeight: 700,
+                  color: TEAL_900,
+                  letterSpacing: "-0.01em",
+                }}
+              >
+                Promemoria dal medico
+              </h2>
+            </div>
+            <p style={{ margin: "6px 0 14px", fontFamily: "var(--font-sans)", fontSize: 14, color: INK_500, lineHeight: 1.45 }}>
+              Da gestire con il tuo medico di base. La visita relativa la registri con il pulsante "+".
+            </p>
+
+            <div
+              style={{
+                background: "#fff",
+                border: `1px solid ${LINE}`,
+                borderRadius: 16,
+                overflow: "hidden",
+              }}
+            >
+              {promemoria.map((p, i) => {
+                const subtitle =
+                  p.azione === "richiedi_colonscopia"
+                    ? "Esito positivo · contatta il medico"
+                    : "Da gestire col tuo medico";
+                return (
+                  <div
+                    key={p.id}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 12,
+                      padding: "12px 12px",
+                      borderTop: i === 0 ? "none" : `1px solid ${LINE}`,
+                      borderLeft: `3px solid ${TEAL}`,
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: 32,
+                        height: 32,
+                        borderRadius: "50%",
+                        background: TEAL_LIGHT,
+                        color: TEAL_DARK,
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        flexShrink: 0,
+                      }}
+                    >
+                      <Stethoscope size={18} strokeWidth={2.2} />
+                    </span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontFamily: "var(--font-sans)", fontSize: 15, fontWeight: 700, color: TEAL_900, lineHeight: 1.25 }}>
+                        {p.nome}
+                      </div>
+                      <div style={{ fontFamily: "var(--font-sans)", fontSize: 13, color: INK_500, marginTop: 2 }}>
+                        {subtitle}
+                      </div>
+                    </div>
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 4,
+                        padding: "4px 10px",
+                        borderRadius: 999,
+                        background: TEAL_LIGHT,
+                        color: TEAL_900,
+                        fontFamily: "var(--font-sans)",
+                        fontSize: 11.5,
+                        fontWeight: 700,
+                        whiteSpace: "nowrap",
+                        flexShrink: 0,
+                      }}
+                    >
+                      Seguito da specialista
+                    </span>
                   </div>
-                  <div style={{ fontFamily: "var(--font-sans)", fontSize: 13, color: INK_500, marginTop: 2 }}>
-                    Parlane alla prossima visita
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6,
-                    padding: "8px 12px",
-                    borderRadius: 999,
-                    background: "#fff",
-                    color: TEAL_DARK,
-                    border: `1.5px solid ${TEAL}`,
-                    cursor: "pointer",
-                    fontFamily: "var(--font-sans)",
-                    fontSize: 13,
-                    fontWeight: 700,
-                    flexShrink: 0,
-                  }}
-                >
-                  <Bookmark size={14} strokeWidth={2.4} />
-                  Salva
-                </button>
-              </div>
-            ))}
-          </div>
-        </section>
+                );
+              })}
+            </div>
+          </section>
+        )}
       </div>
+
+      {/* FAB (clone of /app/piano) */}
+      <Link
+        to="/visita"
+        aria-label="Aggiungi una visita"
+        style={{
+          position: "absolute",
+          right: 18,
+          bottom: 96,
+          width: 60,
+          height: 60,
+          borderRadius: "50%",
+          background: "var(--teal-500)",
+          color: "#fff",
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          boxShadow: "0 12px 24px rgba(4,52,44,0.22)",
+          zIndex: 20,
+        }}
+      >
+        <Plus size={28} strokeWidth={2.6} />
+      </Link>
 
       <BottomNav />
 
