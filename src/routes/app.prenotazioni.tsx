@@ -59,34 +59,13 @@ const INK_700 = "#2E2E2A";
 
 function Inner() {
   const { profile } = useProfile();
-  const { getPrenotazione, setPrenotazione } = usePrenotazioni();
+  const { prenotazioni, getPrenotazione, setPrenotazione } = usePrenotazioni();
 
   const ready = !!profile.sesso && !!profile.eta;
-  const plan = ready ? computePlan(profile as UserProfile) : [];
 
-  // Same SSN logic as app.piano.tsx
-  const diagnosed = new Set(profile.diagnosi_oncologica ?? []);
-  const nazionali = plan.filter((p) =>
-    ["cervice_uterina", "mammella", "colon_retto"].includes(p.id),
-  );
-  const regionali = plan.filter((p) => p.id === "prostata");
-  const ssn = [...nazionali, ...regionali].filter((s) => !diagnosed.has(s.id));
-
-  // Promemoria dal medico (Tier 3 — same source as app.piano.tsx)
-  const promemoria: { id: string; nome: string; icon: ReactNode; bg: string; color: string }[] = [];
-  if (
-    profile.familiarita_cardio === "si" ||
-    (profile.comorbidita ?? []).includes("ipertensione") ||
-    (profile.comorbidita ?? []).includes("colesterolo")
-  ) {
-    promemoria.push({ id: "cardiovascolare", nome: "Cardiovascolare", icon: <Heart size={18} strokeWidth={2.2} />, bg: "#FBE6E6", color: "#C0392B" });
-  }
-  if (profile.familiarita_diabete === "si" || (profile.comorbidita ?? []).includes("diabete") || (profile.eta ?? 0) >= 45) {
-    promemoria.push({ id: "diabete", nome: "Diabete", icon: <Droplet size={18} strokeWidth={2.2} />, bg: "#E6EEFB", color: "#2C6E84" });
-  }
-  promemoria.push({ id: "dermatologia", nome: "Dermatologia", icon: <Sun size={18} strokeWidth={2.2} />, bg: "#FBF1DD", color: "#97681A" });
-  promemoria.push({ id: "oculistica", nome: "Oculistica", icon: <Eye size={18} strokeWidth={2.2} />, bg: TEAL_LIGHT, color: TEAL_DARK });
-  promemoria.push({ id: "controlli_periodici", nome: "Controlli periodici", icon: <Stethoscope size={18} strokeWidth={2.2} />, bg: "#EEF0EC", color: INK_700 });
+  // Source of truth: lo stesso helper usato dalla Home, basato su computePlan.
+  const ssn = ready ? bookableSsnScreenings(profile as UserProfile) : [];
+  const promemoria = ready ? promemoriaMedicoScreenings(profile as UserProfile) : [];
 
   // Order: in_agenda → da_prenotare → eseguito
   type Entry = { s: MatchedScreening; state: StatoPrenotazione };
@@ -95,7 +74,7 @@ function Inner() {
     e.state.stato === "in_agenda" ? 0 : e.state.stato === "da_prenotare" ? 1 : 2;
   entries.sort((a, b) => order(a) - order(b));
 
-  const countDaPrenotare = entries.filter((e) => e.state.stato === "da_prenotare").length;
+  const countDaPrenotare = ready ? contaDaPrenotare(profile as UserProfile, prenotazioni) : 0;
   const eseguiti = entries.filter((e) => e.state.stato === "eseguito");
   const nonEseguiti = entries.filter((e) => e.state.stato !== "eseguito");
 
